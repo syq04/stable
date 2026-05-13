@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用户管理 - 文图互转主题设计系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/element-plus@2.7.0/dist/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--bg-deep:#0b0f19;--bg-surface:#141824;--bg-elevated:#1c2133;--bg-hover:#232840;--border-color:#2a3045;--border-hover:#3d4560;--primary:#6366f1;--primary-light:#818cf8;--primary-glow:rgba(99,102,241,0.25);--accent:#22d3ee;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--sidebar-w:260px;--header-h:64px;--radius:12px;--radius-sm:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);height:100vh;position:fixed;left:0;top:0;background:linear-gradient(180deg,#0e1322,#111729);border-right:1px solid var(--border-color);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sidebar-brand{height:var(--header-h);display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border-color);flex-shrink:0}
+.sidebar-brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
+.sidebar-brand h2{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;white-space:nowrap}
+.sidebar-nav{flex:1;overflow-y:auto;padding:16px 12px}
+.nav-section{margin-bottom:8px}
+.nav-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:8px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);color:var(--text-secondary);font-size:13px;font-weight:500;text-decoration:none;cursor:pointer;transition:all .2s;margin-bottom:2px;position:relative}
+.nav-item i{width:18px;text-align:center;font-size:14px}
+.nav-item:hover{color:var(--text-primary);background:var(--bg-elevated)}
+.nav-item.active{color:var(--primary-light);background:rgba(99,102,241,0.1)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--primary);border-radius:0 3px 3px 0}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border-color);flex-shrink:0}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s}
+.sidebar-user:hover{background:var(--bg-elevated)}
+.sidebar-user .avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#a855f7);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600}
+.sidebar-user .info{flex:1;min-width:0}
+.sidebar-user .name{font-size:13px;font-weight:500}
+.sidebar-user .role{font-size:11px;color:var(--text-muted)}
+.main{flex:1;margin-left:var(--sidebar-w);min-height:100vh}
+.header{height:var(--header-h);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(11,15,25,0.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-color)}
+.header-left{display:flex;align-items:center;gap:16px}
+.menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:16px;cursor:pointer;align-items:center;justify-content:center}
+.header-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:600}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-btn{width:38px;height:38px;border-radius:10px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.header-btn:hover{color:var(--text-primary);border-color:var(--border-hover)}
+.content{padding:28px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.toolbar-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.search-box{position:relative}
+.search-box input{width:260px;height:40px;padding:0 14px 0 38px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;font-family:inherit;outline:none;transition:all .25s}
+.search-box input::placeholder{color:var(--text-muted)}
+.search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.search-box i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px}
+.filter-select{height:40px;padding:0 12px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;font-family:inherit;outline:none;cursor:pointer;min-width:120px}
+.filter-select option{background:var(--bg-surface);color:var(--text-primary)}
+.btn{height:40px;padding:0 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--primary-glow)}
+.btn-danger{background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,0.2)}
+.btn-danger:hover{background:rgba(248,113,113,0.2)}
+.btn-sm{height:32px;padding:0 12px;font-size:12px;border-radius:6px}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-color)}
+.btn-ghost:hover{color:var(--text-primary);border-color:var(--border-hover);background:var(--bg-elevated)}
+.card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius);overflow:hidden}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg-elevated)}
+th{padding:14px 18px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid var(--border-color)}
+td{padding:14px 18px;font-size:13px;border-bottom:1px solid rgba(42,48,69,0.5);white-space:nowrap}
+tr:hover td{background:rgba(99,102,241,0.03)}
+.user-cell{display:flex;align-items:center;gap:12px}
+.user-avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600;flex-shrink:0}
+.user-avatar.admin{background:linear-gradient(135deg,#f87171,#ef4444)}
+.user-avatar.designer{background:linear-gradient(135deg,var(--primary),#a855f7)}
+.user-avatar.user{background:linear-gradient(135deg,var(--accent),#06b6d4)}
+.user-cell .name{font-weight:500}
+.user-cell .email{font-size:12px;color:var(--text-muted)}
+.role-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.role-tag.admin{background:rgba(248,113,113,0.12);color:var(--danger)}
+.role-tag.designer{background:rgba(99,102,241,0.12);color:var(--primary-light)}
+.role-tag.user{background:rgba(34,211,238,0.1);color:var(--accent)}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.status-dot.active{background:var(--success)}
+.status-dot.inactive{background:var(--text-muted)}
+.actions{display:flex;gap:6px}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-top:1px solid var(--border-color)}
+.pagination .info{font-size:12px;color:var(--text-muted)}
+.pagination .pages{display:flex;gap:4px}
+.page-btn{width:34px;height:34px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.page-btn:hover{border-color:var(--border-hover);color:var(--text-primary)}
+.page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{width:480px;max-width:92vw;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius);animation:modalIn .3s cubic-bezier(.16,1,.3,1)}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-color)}
+.modal-header h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:600}
+.modal-close{width:32px;height:32px;border-radius:8px;background:transparent;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.modal-body{padding:24px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border-color)}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:7px}
+.form-input{width:100%;height:44px;padding:0 14px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;transition:all .25s}
+.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.form-input::placeholder{color:var(--text-muted)}
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.mobile-overlay.show{display:block}.main{margin-left:0}.menu-toggle{display:flex}.content{padding:16px}.toolbar{flex-direction:column;align-items:stretch}.search-box input{width:100%}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="layout">
+    <div class="mobile-overlay" :class="{show:sidebarOpen}" @click="sidebarOpen=false"></div>
+    <aside class="sidebar" :class="{open:sidebarOpen}">
+      <div class="sidebar-brand">
+        <div class="logo"><i class="fas fa-wand-magic-sparkles"></i></div>
+        <h2>文图互转设计</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section"><div class="nav-section-title">概览</div><a class="nav-item" href="dashboard.html"><i class="fas fa-grid-2"></i> 工作台</a></div>
+        <div class="nav-section"><div class="nav-section-title">创作</div><a class="nav-item" href="text2image.html"><i class="fas fa-image"></i> 文生图</a><a class="nav-item" href="image2text.html"><i class="fas fa-font"></i> 图生文</a></div>
+        <div class="nav-section"><div class="nav-section-title">管理</div><a class="nav-item" href="style_management.html"><i class="fas fa-palette"></i> 风格管理</a><a class="nav-item" href="lora_training.html"><i class="fas fa-brain"></i> LoRA训练</a></div>
+        <div class="nav-section"><div class="nav-section-title">系统</div><a class="nav-item" href="admin_dashboard.html"><i class="fas fa-gauge-high"></i> 系统概览</a><a class="nav-item active" href="admin_users.html"><i class="fas fa-users-gear"></i> 用户管理</a><a class="nav-item" href="admin_settings.html"><i class="fas fa-sliders"></i> 系统配置</a><a class="nav-item" href="admin_logs.html"><i class="fas fa-scroll"></i> 日志管理</a><a class="nav-item" href="admin_models.html"><i class="fas fa-cube"></i> 模型管理</a></div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user"><div class="avatar">张</div><div class="info"><div class="name">张明远</div><div class="role">系统管理员</div></div></div></div>
+    </aside>
+
+    <div class="main">
+      <header class="header">
+        <div class="header-left">
+          <button class="menu-toggle" @click="sidebarOpen=!sidebarOpen"><i class="fas fa-bars"></i></button>
+          <h1 class="header-title">用户管理</h1>
+        </div>
+        <div class="header-right"><button class="header-btn"><i class="fas fa-bell"></i></button></div>
+      </header>
+
+      <div class="content">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input v-model="keyword" placeholder="搜索用户名或邮箱...">
+            </div>
+            <select class="filter-select" v-model="roleFilter">
+              <option value="">全部角色</option>
+              <option value="ADMIN">管理员</option>
+              <option value="DESIGNER">设计师</option>
+              <option value="USER">普通用户</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" @click="openCreate">
+            <i class="fas fa-plus"></i> 创建用户
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>用户</th>
+                  <th>角色</th>
+                  <th>状态</th>
+                  <th>注册时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="u in filteredUsers" :key="u.id">
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-avatar" :class="u.role.toLowerCase()">{{ u.name[0] }}</div>
+                      <div>
+                        <div class="name">{{ u.name }}</div>
+                        <div class="email">{{ u.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="role-tag" :class="u.role.toLowerCase()">{{ roleLabel(u.role) }}</span></td>
+                  <td><span class="status-dot" :class="u.active?'active':'inactive'"></span>{{ u.active?'活跃':'禁用' }}</td>
+                  <td>{{ u.createdAt }}</td>
+                  <td>
+                    <div class="actions">
+                      <button class="btn btn-ghost btn-sm" @click="openEdit(u)"><i class="fas fa-pen"></i></button>
+                      <button class="btn btn-danger btn-sm" @click="confirmDelete(u)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="info">共 {{ filteredUsers.length }} 条记录</div>
+            <div class="pages">
+              <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" v-if="showModal" @click.self="showModal=false">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>{{ isEdit ? '编辑用户' : '创建用户' }}</h3>
+        <button class="modal-close" @click="showModal=false"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input class="form-input" v-model="editForm.username" placeholder="输入用户名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">邮箱</label>
+          <input class="form-input" type="email" v-model="editForm.email" placeholder="输入邮箱">
+        </div>
+        <div class="form-group" v-if="!isEdit">
+          <label class="form-label">密码</label>
+          <input class="form-input" type="password" v-model="editForm.password" placeholder="设置密码">
+        </div>
+        <div class="form-group">
+          <label class="form-label">角色</label>
+          <select class="form-input" v-model="editForm.role" style="cursor:pointer">
+            <option value="USER">普通用户</option>
+            <option value="DESIGNER">设计师</option>
+            <option value="ADMIN">管理员</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" @click="showModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveUser">{{ isEdit ? '保存' : '创建' }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/element-plus@2.7.0/dist/index.full.min.js"></script>
+<script>
+const{createApp,ref,reactive,computed}=Vue;
+createApp({
+  setup(){
+    const sidebarOpen=ref(false);
+    const keyword=ref('');
+    const roleFilter=ref('');
+    const showModal=ref(false);
+    const isEdit=ref(false);
+    const editForm=reactive({id:null,username:'',email:'',password:'',role:'USER'});
+
+    const users=reactive([
+      {id:1,name:'张明远',email:'zhangmy@example.com',role:'ADMIN',active:true,createdAt:'2026-01-15'},
+      {id:2,name:'李思涵',email:'lisihan@example.com',role:'DESIGNER',active:true,createdAt:'2026-02-20'},
+      {id:3,name:'王艺萱',email:'wangyx@example.com',role:'DESIGNER',active:true,createdAt:'2026-03-05'},
+      {id:4,name:'陈浩然',email:'chenhr@example.com',role:'USER',active:true,createdAt:'2026-03-18'},
+      {id:5,name:'刘雨桐',email:'liuyt@example.com',role:'USER',active:false,createdAt:'2026-04-02'},
+      {id:6,name:'赵子墨',email:'zhaozm@example.com',role:'USER',active:true,createdAt:'2026-04-10'},
+      {id:7,name:'孙晓峰',email:'sunxf@example.com',role:'DESIGNER',active:true,createdAt:'2026-04-22'},
+      {id:8,name:'周雅琪',email:'zhouyq@example.com',role:'USER',active:true,createdAt:'2026-05-01'}
+    ]);
+
+    const filteredUsers=computed(()=>{
+      return users.filter(u=>{
+        const matchKey=!keyword.value||u.name.includes(keyword.value)||u.email.includes(keyword.value);
+        const matchRole=!roleFilter.value||u.role===roleFilter.value;
+        return matchKey&&matchRole;
+      });
+    });
+
+    const roleLabel=(r)=>({ADMIN:'管理员',DESIGNER:'设计师',USER:'普通用户'}[r]||r);
+
+    const openCreate=()=>{
+      isEdit.value=false;
+      Object.assign(editForm,{id:null,username:'',email:'',password:'',role:'USER'});
+      showModal.value=true;
+    };
+    const openEdit=(u)=>{
+      isEdit.value=true;
+      Object.assign(editForm,{id:u.id,username:u.name,email:u.email,password:'',role:u.role});
+      showModal.value=true;
+    };
+    const saveUser=()=>{
+      if(!editForm.username||!editForm.email){
+        ElementPlus.ElMessage.warning('请填写必填项');return;
+      }
+      if(isEdit.value){
+        const u=users.find(x=>x.id===editForm.id);
+        if(u){u.name=editForm.username;u.email=editForm.email;u.role=editForm.role;}
+        ElementPlus.ElMessage.success('用户已更新');
+      }else{
+        if(!editForm.password){ElementPlus.ElMessage.warning('请设置密码');return;}
+        users.push({id:Date.now(),name:editForm.username,email:editForm.email,role:editForm.role,active:true,createdAt:'2026-05-10'});
+        ElementPlus.ElMessage.success('用户已创建');
+      }
+      showModal.value=false;
+    };
+    const confirmDelete=(u)=>{
+      ElementPlus.ElMessageBox.confirm(`确定要删除用户「${u.name}」吗？此操作不可恢复。`,'删除确认',{
+        confirmButtonText:'删除',cancelButtonText:'取消',type:'warning'
+      }).then(()=>{
+        const idx=users.findIndex(x=>x.id===u.id);
+        if(idx>-1)users.splice(idx,1);
+        ElementPlus.ElMessage.success('用户已删除');
+      }).catch(()=>{});
+    };
+
+    return{sidebarOpen,keyword,roleFilter,showModal,isEdit,editForm,users,filteredUsers,roleLabel,openCreate,openEdit,saveUser,confirmDelete};
+  }
+}).use(ElementPlus).mount('#app');
+</script>
+</body>
+</html>

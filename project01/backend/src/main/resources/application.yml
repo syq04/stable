@@ -1,0 +1,108 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: h2
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      table-format: "`%s`"
+
+jwt:
+  secret: nebula-studio-secret-key-for-jwt-token-generation-must-be-at-least-256-bits-long
+  expiration: 86400000
+
+ai:
+  text2image:
+    provider: sd
+    fallback: pollinations
+  image2text:
+    provider: mock
+    fallback: mock
+  sd:
+    enabled: true
+    api-url: http://127.0.0.1:7860
+    timeout: 300
+  comfyui:
+    enabled: true
+    api-url: http://127.0.0.1:8188
+    timeout: 120
+    poll-interval: 2000
+    workflow: workflow/comfyui_default.json
+  doubao:
+    enabled: false
+    api-url: https://ark.cn-beijing.volces.com/api/v3/chat/completions
+    api-key: ""
+    model: doubao-vision-pro-32k
+    timeout: 60
+  huggingface:
+    api-key: ""
+    text2image:
+      model: stabilityai/stable-diffusion-xl-base-1.0
+    image2text:
+      model: Salesforce/blip-image-captioning-large
+  gemini:
+    api-key: ""
+    model: gemini-2.0-flash
+  openrouter:
+    api-key: ""
+    model: meta-llama/llama-3.2-11b-vision-instruct:free
+  siliconflow:
+    api-key: ""
+    text2image-model: Kwai-Kolors/Kolors
+  zhipu:
+    api-key: ""
+    text2image-model: cogview-3-flash
+    vision-model: GLM-4V-Flash
+
+storage:
+  local:
+    enabled: true
+    path: ./uploads
+    url-prefix: /uploads/
+
+logging:
+  level:
+    com.nebula.studio: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: h2
+  datasource:
+    url: jdbc:h2:file:./data/nebula_studio;DB_CLOSE_DELAY=-1;MODE=MySQL;AUTO_SERVER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:h2-schema.sql
+      continue-on-error: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    url: jdbc:mysql://localhost:3306/nebula_studio?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver

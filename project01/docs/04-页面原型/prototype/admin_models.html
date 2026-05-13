@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型管理 - 文图互转主题设计系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/element-plus@2.7.0/dist/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--bg-deep:#0b0f19;--bg-surface:#141824;--bg-elevated:#1c2133;--bg-hover:#232840;--border-color:#2a3045;--border-hover:#3d4560;--primary:#6366f1;--primary-light:#818cf8;--primary-glow:rgba(99,102,241,0.25);--accent:#22d3ee;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--sidebar-w:260px;--header-h:64px;--radius:12px;--radius-sm:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);height:100vh;position:fixed;left:0;top:0;background:linear-gradient(180deg,#0e1322,#111729);border-right:1px solid var(--border-color);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sidebar-brand{height:var(--header-h);display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border-color);flex-shrink:0}
+.sidebar-brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
+.sidebar-brand h2{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;white-space:nowrap}
+.sidebar-nav{flex:1;overflow-y:auto;padding:16px 12px}
+.nav-section{margin-bottom:8px}
+.nav-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:8px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);color:var(--text-secondary);font-size:13px;font-weight:500;text-decoration:none;cursor:pointer;transition:all .2s;margin-bottom:2px;position:relative}
+.nav-item i{width:18px;text-align:center;font-size:14px}
+.nav-item:hover{color:var(--text-primary);background:var(--bg-elevated)}
+.nav-item.active{color:var(--primary-light);background:rgba(99,102,241,0.1)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--primary);border-radius:0 3px 3px 0}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border-color);flex-shrink:0}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s}
+.sidebar-user:hover{background:var(--bg-elevated)}
+.sidebar-user .avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#a855f7);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600}
+.sidebar-user .info{flex:1;min-width:0}
+.sidebar-user .name{font-size:13px;font-weight:500}
+.sidebar-user .role{font-size:11px;color:var(--text-muted)}
+.main{flex:1;margin-left:var(--sidebar-w);min-height:100vh}
+.header{height:var(--header-h);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(11,15,25,0.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-color)}
+.header-left{display:flex;align-items:center;gap:16px}
+.menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:16px;cursor:pointer;align-items:center;justify-content:center}
+.header-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:600}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-btn{width:38px;height:38px;border-radius:10px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.header-btn:hover{color:var(--text-primary);border-color:var(--border-hover)}
+.content{padding:28px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.toolbar-left{display:flex;align-items:center;gap:12px}
+.search-box{position:relative}
+.search-box input{width:240px;height:40px;padding:0 14px 0 38px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;font-family:inherit;outline:none;transition:all .25s}
+.search-box input::placeholder{color:var(--text-muted)}
+.search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.search-box i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px}
+.filter-select{height:40px;padding:0 12px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;font-family:inherit;outline:none;cursor:pointer}
+.filter-select option{background:var(--bg-surface)}
+.btn{height:40px;padding:0 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--primary-glow)}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-color)}
+.btn-ghost:hover{color:var(--text-primary);border-color:var(--border-hover);background:var(--bg-elevated)}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+.model-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius);overflow:hidden;transition:all .25s}
+.model-card:hover{border-color:var(--border-hover);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.2)}
+.model-card .header-area{padding:20px 22px;border-bottom:1px solid var(--border-color);display:flex;align-items:flex-start;justify-content:space-between}
+.model-card .header-area .left{display:flex;align-items:center;gap:14px}
+.model-card .header-area .icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.model-card .header-area .icon.text2img{background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15));color:var(--primary-light)}
+.model-card .header-area .icon.img2text{background:linear-gradient(135deg,rgba(34,211,238,0.12),rgba(6,182,212,0.12));color:var(--accent)}
+.model-card .header-area .icon.lora{background:linear-gradient(135deg,rgba(52,211,153,0.12),rgba(16,185,129,0.12));color:var(--success)}
+.model-card .header-area .info .name{font-size:15px;font-weight:600;margin-bottom:2px}
+.model-card .header-area .info .type{font-size:11px;color:var(--text-muted)}
+.model-card .header-area .status{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600}
+.model-card .header-area .status.active{background:rgba(52,211,153,0.12);color:var(--success)}
+.model-card .header-area .status.inactive{background:rgba(100,116,139,0.12);color:var(--text-muted)}
+.model-card .header-area .status.loading{background:rgba(251,191,36,0.12);color:var(--warning)}
+.model-card .body{padding:18px 22px}
+.model-card .body .specs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.spec-item{background:var(--bg-elevated);border-radius:6px;padding:10px 12px}
+.spec-item .label{font-size:11px;color:var(--text-muted);margin-bottom:3px}
+.spec-item .value{font-size:13px;font-weight:500}
+.model-card .body .desc{font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:14px}
+.model-card .actions{display:flex;border-top:1px solid var(--border-color)}
+.model-card .actions button{flex:1;height:40px;background:transparent;border:none;color:var(--text-muted);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.model-card .actions button:hover{color:var(--text-primary);background:var(--bg-elevated)}
+.model-card .actions button+button{border-left:1px solid var(--border-color)}
+.model-card .actions button.del:hover{color:var(--danger);background:rgba(248,113,113,0.05)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{width:520px;max-width:94vw;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius);max-height:90vh;overflow-y:auto;animation:modalIn .3s cubic-bezier(.16,1,.3,1)}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-color)}
+.modal-header h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:600}
+.modal-close{width:32px;height:32px;border-radius:8px;background:transparent;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.modal-body{padding:24px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border-color)}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:7px}
+.form-input{width:100%;height:44px;padding:0 14px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;transition:all .25s}
+.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.form-input::placeholder{color:var(--text-muted)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.mobile-overlay.show{display:block}.main{margin-left:0}.menu-toggle{display:flex}.content{padding:16px}.model-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="layout">
+    <div class="mobile-overlay" :class="{show:sidebarOpen}" @click="sidebarOpen=false"></div>
+    <aside class="sidebar" :class="{open:sidebarOpen}">
+      <div class="sidebar-brand"><div class="logo"><i class="fas fa-wand-magic-sparkles"></i></div><h2>文图互转设计</h2></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section"><div class="nav-section-title">概览</div><a class="nav-item" href="dashboard.html"><i class="fas fa-grid-2"></i> 工作台</a></div>
+        <div class="nav-section"><div class="nav-section-title">创作</div><a class="nav-item" href="text2image.html"><i class="fas fa-image"></i> 文生图</a><a class="nav-item" href="image2text.html"><i class="fas fa-font"></i> 图生文</a></div>
+        <div class="nav-section"><div class="nav-section-title">管理</div><a class="nav-item" href="style_management.html"><i class="fas fa-palette"></i> 风格管理</a><a class="nav-item" href="lora_training.html"><i class="fas fa-brain"></i> LoRA训练</a></div>
+        <div class="nav-section"><div class="nav-section-title">系统</div><a class="nav-item" href="admin_dashboard.html"><i class="fas fa-gauge-high"></i> 系统概览</a><a class="nav-item" href="admin_users.html"><i class="fas fa-users-gear"></i> 用户管理</a><a class="nav-item" href="admin_settings.html"><i class="fas fa-sliders"></i> 系统配置</a><a class="nav-item" href="admin_logs.html"><i class="fas fa-scroll"></i> 日志管理</a><a class="nav-item active" href="admin_models.html"><i class="fas fa-cube"></i> 模型管理</a></div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user"><div class="avatar">张</div><div class="info"><div class="name">张明远</div><div class="role">系统管理员</div></div></div></div>
+    </aside>
+
+    <div class="main">
+      <header class="header">
+        <div class="header-left"><button class="menu-toggle" @click="sidebarOpen=!sidebarOpen"><i class="fas fa-bars"></i></button><h1 class="header-title">模型管理</h1></div>
+        <div class="header-right"><button class="header-btn"><i class="fas fa-arrows-rotate"></i></button></div>
+      </header>
+
+      <div class="content">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><i class="fas fa-search"></i><input v-model="keyword" placeholder="搜索模型名称..."></div>
+            <select class="filter-select" v-model="typeFilter">
+              <option value="">全部类型</option>
+              <option value="text2img">文生图</option>
+              <option value="img2text">图生文</option>
+              <option value="lora">LoRA</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" @click="showUpload=true"><i class="fas fa-upload"></i> 上传模型</button>
+        </div>
+
+        <div class="model-grid">
+          <div class="model-card" v-for="m in filteredModels" :key="m.id">
+            <div class="header-area">
+              <div class="left">
+                <div class="icon" :class="m.type"><i :class="typeIcon(m.type)"></i></div>
+                <div class="info"><div class="name">{{ m.name }}</div><div class="type">{{ typeLabel(m.type) }}</div></div>
+              </div>
+              <span class="status" :class="m.status">{{ statusLabel(m.status) }}</span>
+            </div>
+            <div class="body">
+              <div class="specs">
+                <div class="spec-item"><div class="label">版本</div><div class="value">{{ m.version }}</div></div>
+                <div class="spec-item"><div class="label">大小</div><div class="value">{{ m.size }}</div></div>
+                <div class="spec-item"><div class="label">精度</div><div class="value">{{ m.precision }}</div></div>
+                <div class="spec-item"><div class="label">调用次数</div><div class="value">{{ m.callCount }}</div></div>
+              </div>
+              <div class="desc">{{ m.description }}</div>
+            </div>
+            <div class="actions">
+              <button @click="toggleStatus(m)"><i :class="m.status==='active'?'fas fa-pause':'fas fa-play'"></i> {{ m.status==='active'?'停用':'启用' }}</button>
+              <button @click="viewConfig(m)"><i class="fas fa-gear"></i> 配置</button>
+              <button class="del" @click="confirmDelete(m)"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" v-if="showUpload" @click.self="showUpload=false">
+    <div class="modal">
+      <div class="modal-header"><h3>上传模型</h3><button class="modal-close" @click="showUpload=false"><i class="fas fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">模型名称</label><input class="form-input" v-model="uploadForm.name" placeholder="输入模型名称"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">模型类型</label>
+            <select class="form-input" v-model="uploadForm.type" style="cursor:pointer">
+              <option value="text2img">文生图</option>
+              <option value="img2text">图生文</option>
+              <option value="lora">LoRA</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">精度</label>
+            <select class="form-input" v-model="uploadForm.precision" style="cursor:pointer">
+              <option value="FP16">FP16</option>
+              <option value="FP32">FP32</option>
+              <option value="BF16">BF16</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">模型文件</label>
+          <div style="border:2px dashed var(--border-color);border-radius:var(--radius-sm);padding:28px;text-align:center;cursor:pointer;transition:all .3s" @click="ElementPlus.ElMessage.info('请选择模型文件')">
+            <i class="fas fa-cloud-arrow-up" style="font-size:28px;color:var(--primary-light);margin-bottom:10px;opacity:0.6"></i>
+            <div style="font-size:13px;font-weight:500">点击选择模型文件</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">支持 .safetensors, .ckpt, .pt 格式</div>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">描述</label><textarea class="form-input" v-model="uploadForm.description" placeholder="输入模型描述" style="min-height:80px;padding:12px 14px;resize:vertical"></textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" @click="showUpload=false">取消</button><button class="btn btn-primary" @click="uploadModel">上传</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/element-plus@2.7.0/dist/index.full.min.js"></script>
+<script>
+const{createApp,ref,reactive,computed}=Vue;
+createApp({
+  setup(){
+    const sidebarOpen=ref(false);
+    const keyword=ref('');
+    const typeFilter=ref('');
+    const showUpload=ref(false);
+    const uploadForm=reactive({name:'',type:'text2img',precision:'FP16',description:''});
+
+    const models=reactive([
+      {id:1,name:'Stable Diffusion XL 1.0',type:'text2img',status:'active',version:'v1.0',size:'6.94 GB',precision:'FP16',callCount:12580,description:'Stability AI 推出的高性能文生图基础模型，支持1024×1024分辨率生成'},
+      {id:2,name:'BLIP-2 OPT 2.7B',type:'img2text',status:'active',version:'v2.7b',size:'5.2 GB',precision:'FP16',callCount:4230,description:'Salesforce 推出的视觉语言模型，支持图像描述生成和视觉问答'},
+      {id:3,name:'品牌VI风格 LoRA',type:'lora',status:'active',version:'v2.1',size:'144 MB',precision:'FP16',callCount:890,description:'基于品牌VI规范训练的风格适配器，适用于品牌视觉内容生成'},
+      {id:4,name:'ControlNet v1.1',type:'text2img',status:'active',version:'v1.1',size:'1.4 GB',precision:'FP16',callCount:3200,description:'条件控制模型，支持边缘、深度、姿态等多种条件引导生成'},
+      {id:5,name:'产品摄影 LoRA',type:'lora',status:'loading',version:'v1.0',size:'128 MB',precision:'FP16',callCount:0,description:'电商产品摄影风格适配器，白底专业灯光效果'},
+      {id:6,name:'SDXL Turbo',type:'text2img',status:'inactive',version:'v1.0',size:'6.94 GB',precision:'FP16',callCount:560,description:'SDXL加速版本，支持4步快速生成，质量略有降低'}
+    ]);
+
+    const filteredModels=computed(()=>models.filter(m=>{
+      if(keyword.value&&!m.name.toLowerCase().includes(keyword.value.toLowerCase()))return false;
+      if(typeFilter.value&&m.type!==typeFilter.value)return false;
+      return true;
+    }));
+
+    const typeLabel=(t)=>({text2img:'文生图模型',img2text:'图生文模型',lora:'LoRA适配器'}[t]);
+    const typeIcon=(t)=>({text2img:'fas fa-image',img2text:'fas fa-font',lora:'fas fa-brain'}[t]);
+    const statusLabel=(s)=>({active:'运行中',inactive:'已停用',loading:'加载中'}[s]);
+
+    const toggleStatus=(m)=>{
+      if(m.status==='active'){m.status='inactive';ElementPlus.ElMessage.info('模型已停用');}
+      else if(m.status==='inactive'){m.status='loading';setTimeout(()=>{m.status='active';ElementPlus.ElMessage.success('模型已启用');},1500);}
+    };
+    const viewConfig=(m)=>{ElementPlus.ElMessage.info('查看模型配置：'+m.name);};
+    const confirmDelete=(m)=>{
+      ElementPlus.ElMessageBox.confirm(`确定删除模型「${m.name}」吗？此操作不可撤销。`,'删除确认',{confirmButtonText:'删除',cancelButtonText:'取消',type:'warning'}).then(()=>{
+        const idx=models.findIndex(x=>x.id===m.id);if(idx>-1)models.splice(idx,1);ElementPlus.ElMessage.success('模型已删除');
+      }).catch(()=>{});
+    };
+    const uploadModel=()=>{
+      if(!uploadForm.name){ElementPlus.ElMessage.warning('请输入模型名称');return;}
+      ElementPlus.ElMessage.success('模型上传已开始');
+      showUpload.value=false;
+    };
+
+    return{sidebarOpen,keyword,typeFilter,showUpload,uploadForm,models,filteredModels,typeLabel,typeIcon,statusLabel,toggleStatus,viewConfig,confirmDelete,uploadModel};
+  }
+}).use(ElementPlus).mount('#app');
+</script>
+</body>
+</html>

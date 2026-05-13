@@ -1,0 +1,40 @@
+# ComfyUI portable (36GB - download separately)
+ComfyUI_windows_portable_nvidia_cu126/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.venv/
+*.egg-info
+
+# Node
+node_modules/
+project01/frontend/node_modules/
+project01/node_modules/
+
+# Maven build
+project01/backend/target/
+
+# Runtime data
+project01/backend/uploads/
+project01/backend/data/
+project01/backend/*.pid
+outputs/
+
+# Build artifacts
+project01/frontend/dist/
+
+# AI tool sessions
+project01/.aionrs/
+
+# Maven source (users install maven themselves)
+project01/apache-maven-3.9.15-src/
+
+# IDE
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>注册 - 文图互转主题设计系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/element-plus@2.7.0/dist/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg-deep: #0b0f19;
+  --bg-surface: #141824;
+  --bg-elevated: #1c2133;
+  --border-color: #2a3045;
+  --border-hover: #3d4560;
+  --primary: #6366f1;
+  --primary-light: #818cf8;
+  --primary-glow: rgba(99,102,241,0.3);
+  --accent: #22d3ee;
+  --accent-glow: rgba(34,211,238,0.2);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --success: #34d399;
+  --danger: #f87171;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.register-scene {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 80% 50%, rgba(34,211,238,0.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(99,102,241,0.08) 0%, transparent 50%),
+              var(--bg-deep);
+}
+.orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35;
+  animation: orbFloat 22s ease-in-out infinite;
+}
+.orb-1 { width:350px; height:350px; background:rgba(34,211,238,0.25); top:-8%; right:-3%; animation-delay:-5s; }
+.orb-2 { width:280px; height:280px; background:rgba(99,102,241,0.2); bottom:-5%; left:-5%; animation-delay:-12s; }
+@keyframes orbFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(30px,-30px) scale(1.04); }
+  66% { transform: translate(-25px,25px) scale(0.96); }
+}
+.grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+.register-card {
+  position: relative; z-index: 10;
+  width: 460px; max-width: 94vw;
+  background: rgba(20,24,36,0.88);
+  backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 44px 40px;
+  box-shadow: 0 0 80px rgba(34,211,238,0.06), 0 20px 60px rgba(0,0,0,0.4);
+  animation: cardIn 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(30px) scale(0.96); }
+  to { opacity:1; transform: translateY(0) scale(1); }
+}
+.brand { text-align: center; margin-bottom: 32px; }
+.brand-icon {
+  width: 52px; height: 52px; margin: 0 auto 14px;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #fff;
+  box-shadow: 0 8px 28px var(--accent-glow);
+}
+.brand h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: 20px; font-weight: 600;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.brand p { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block; font-size: 13px; font-weight: 500;
+  color: var(--text-secondary); margin-bottom: 7px;
+}
+.form-input-wrap { position: relative; }
+.form-input-wrap > i {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 14px; transition: color 0.2s; z-index: 1;
+}
+.form-input {
+  width: 100%; height: 44px; padding: 0 14px 0 42px;
+  background: var(--bg-elevated); border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm); color: var(--text-primary);
+  font-size: 14px; font-family: inherit;
+  transition: all 0.25s ease; outline: none;
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-input:hover { border-color: var(--border-hover); }
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.form-input:focus ~ i { color: var(--primary-light); }
+.pwd-strength {
+  display: flex; gap: 4px; margin-top: 8px;
+}
+.pwd-strength .bar {
+  flex: 1; height: 3px; border-radius: 2px;
+  background: var(--border-color); transition: background 0.3s;
+}
+.pwd-strength .bar.active.weak { background: var(--danger); }
+.pwd-strength .bar.active.medium { background: var(--warning); }
+.pwd-strength .bar.active.strong { background: var(--success); }
+.pwd-hint {
+  font-size: 11px; margin-top: 4px; color: var(--text-muted);
+  transition: color 0.3s;
+}
+.pwd-hint.weak { color: var(--danger); }
+.pwd-hint.medium { color: var(--warning); }
+.pwd-hint.strong { color: var(--success); }
+.agreement {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin: 20px 0 24px; font-size: 12px; color: var(--text-secondary);
+  line-height: 1.6;
+}
+.agreement input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: var(--primary);
+  margin-top: 2px; flex-shrink: 0; cursor: pointer;
+}
+.agreement a { color: var(--primary-light); text-decoration: none; }
+.agreement a:hover { color: var(--accent); }
+.btn-primary {
+  width: 100%; height: 46px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  border: none; border-radius: var(--radius-sm);
+  color: #fff; font-size: 15px; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative; overflow: hidden;
+}
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, #7c3aed, var(--accent));
+  opacity: 0; transition: opacity 0.3s;
+}
+.btn-primary:hover::before { opacity: 1; }
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px var(--primary-glow);
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-primary span { position: relative; z-index: 1; }
+.login-link {
+  text-align: center; font-size: 13px; color: var(--text-secondary);
+  margin-top: 24px;
+}
+.login-link a {
+  color: var(--primary-light); text-decoration: none;
+  font-weight: 500; transition: color 0.2s;
+}
+.login-link a:hover { color: var(--accent); }
+@media (max-width: 480px) {
+  .register-card { padding: 32px 20px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="register-scene">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="grid-bg"></div>
+
+    <div class="register-card">
+      <div class="brand">
+        <div class="brand-icon"><i class="fas fa-user-plus"></i></div>
+        <h1>创建新账号</h1>
+        <p>开启你的AI创意之旅</p>
+      </div>
+
+      <form @submit.prevent="handleRegister">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <div class="form-input-wrap">
+            <input type="text" class="form-input" v-model="form.username"
+              placeholder="3-64个字符" required minlength="3" maxlength="64">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">邮箱地址</label>
+          <div class="form-input-wrap">
+            <input type="email" class="form-input" v-model="form.email"
+              placeholder="请输入邮箱" required>
+            <i class="fas fa-envelope"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">设置密码</label>
+          <div class="form-input-wrap">
+            <input :type="showPwd ? 'text' : 'password'" class="form-input"
+              v-model="form.password" placeholder="6位以上，含字母和数字"
+              required minlength="6" style="padding-right:42px">
+            <i class="fas fa-lock"></i>
+            <i :class="showPwd ? 'fas fa-eye' : 'fas fa-eye-slash'"
+              @click="showPwd=!showPwd"
+              style="left:auto;right:14px;cursor:pointer;z-index:2"></i>
+          </div>
+          <div class="pwd-strength" v-if="form.password">
+            <div class="bar" :class="{ active: pwdLevel>=1, [pwdLevelText]: pwdLevel>=1 }"></div>
+            <div class="bar" :class="{ active: pwdLevel>=2, [pwdLevelText]: pwdLevel>=2 }"></div>
+            <div class="bar" :class="{ active: pwdLevel>=3, [pwdLevelText]: pwdLevel>=3 }"></div>
+          </div>
+          <div class="pwd-hint" v-if="form.password" :class="pwdLevelText">
+            {{ pwdLevel===1 ? '密码强度：弱' : pwdLevel===2 ? '密码强度：中' : '密码强度：强' }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">确认密码</label>
+          <div class="form-input-wrap">
+            <input type="password" class="form-input" v-model="form.confirmPwd"
+              placeholder="再次输入密码" required>
+            <i class="fas fa-shield-halved"></i>
+          </div>
+        </div>
+
+        <label class="agreement">
+          <input type="checkbox" v-model="form.agreed" required>
+          我已阅读并同意<a href="#">《用户服务协议》</a>和<a href="#">《隐私政策》</a>
+        </label>
+
+        <button type="submit" class="btn-primary" :disabled="loading">
+          <span>{{ loading ? '注册中...' : '注 册' }}</span>
+        </button>
+      </form>
+
+      <div class="login-link">
+        已有账号？<a href="user_login.html">立即登录</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/element-plus@2.7.0/dist/index.full.min.js"></script>
+<script>
+const { createApp, ref, reactive, computed } = Vue;
+createApp({
+  setup() {
+    const form = reactive({
+      username: '', email: '', password: '', confirmPwd: '', agreed: false
+    });
+    const showPwd = ref(false);
+    const loading = ref(false);
+
+    const pwdLevel = computed(() => {
+      const p = form.password;
+      if (!p) return 0;
+      let score = 0;
+      if (p.length >= 6) score++;
+      if (/[a-z]/.test(p) && /[A-Z]/.test(p)) score++;
+      if (/\d/.test(p) && /[^a-zA-Z0-9]/.test(p)) score++;
+      return score || 1;
+    });
+    const pwdLevelText = computed(() =>
+      ['', 'weak', 'medium', 'strong'][pwdLevel.value]
+    );
+
+    const handleRegister = () => {
+      if (!form.username || !form.email || !form.password) {
+        ElementPlus.ElMessage.warning('请填写所有必填项');
+        return;
+      }
+      if (form.password !== form.confirmPwd) {
+        ElementPlus.ElMessage.error('两次输入的密码不一致');
+        return;
+      }
+      if (!form.agreed) {
+        ElementPlus.ElMessage.warning('请先同意用户协议');
+        return;
+      }
+      loading.value = true;
+      setTimeout(() => {
+        loading.value = false;
+        ElementPlus.ElMessage.success('注册成功，请登录');
+        setTimeout(() => { window.location.href = 'user_login.html'; }, 800);
+      }, 1500);
+    };
+
+    return { form, showPwd, loading, pwdLevel, pwdLevelText, handleRegister };
+  }
+}).use(ElementPlus).mount('#app');
+</script>
+</body>
+</html>

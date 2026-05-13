@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统配置 - 文图互转主题设计系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/element-plus@2.7.0/dist/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--bg-deep:#0b0f19;--bg-surface:#141824;--bg-elevated:#1c2133;--bg-hover:#232840;--border-color:#2a3045;--border-hover:#3d4560;--primary:#6366f1;--primary-light:#818cf8;--primary-glow:rgba(99,102,241,0.25);--accent:#22d3ee;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--sidebar-w:260px;--header-h:64px;--radius:12px;--radius-sm:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);height:100vh;position:fixed;left:0;top:0;background:linear-gradient(180deg,#0e1322,#111729);border-right:1px solid var(--border-color);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sidebar-brand{height:var(--header-h);display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border-color);flex-shrink:0}
+.sidebar-brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
+.sidebar-brand h2{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;white-space:nowrap}
+.sidebar-nav{flex:1;overflow-y:auto;padding:16px 12px}
+.nav-section{margin-bottom:8px}
+.nav-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:8px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);color:var(--text-secondary);font-size:13px;font-weight:500;text-decoration:none;cursor:pointer;transition:all .2s;margin-bottom:2px;position:relative}
+.nav-item i{width:18px;text-align:center;font-size:14px}
+.nav-item:hover{color:var(--text-primary);background:var(--bg-elevated)}
+.nav-item.active{color:var(--primary-light);background:rgba(99,102,241,0.1)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--primary);border-radius:0 3px 3px 0}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border-color);flex-shrink:0}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s}
+.sidebar-user:hover{background:var(--bg-elevated)}
+.sidebar-user .avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#a855f7);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600}
+.sidebar-user .info{flex:1;min-width:0}
+.sidebar-user .name{font-size:13px;font-weight:500}
+.sidebar-user .role{font-size:11px;color:var(--text-muted)}
+.main{flex:1;margin-left:var(--sidebar-w);min-height:100vh}
+.header{height:var(--header-h);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(11,15,25,0.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-color)}
+.header-left{display:flex;align-items:center;gap:16px}
+.menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:16px;cursor:pointer;align-items:center;justify-content:center}
+.header-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:600}
+.content{padding:28px}
+.tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border-color);padding-bottom:0}
+.tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px}
+.tab:hover{color:var(--text-secondary)}
+.tab.active{color:var(--primary-light);border-bottom-color:var(--primary)}
+.settings-section{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius);margin-bottom:18px}
+.section-title{padding:18px 22px;border-bottom:1px solid var(--border-color);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.section-title i{color:var(--accent);font-size:13px}
+.section-body{padding:22px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{margin-bottom:18px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:7px}
+.form-label .hint{font-size:11px;color:var(--text-muted);font-weight:400}
+.form-input{width:100%;height:44px;padding:0 14px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;transition:all .25s}
+.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.form-input::placeholder{color:var(--text-muted)}
+textarea.form-input{height:auto;min-height:80px;padding:12px 14px;resize:vertical;line-height:1.6}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(42,48,69,0.4)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row .left{flex:1}
+.toggle-row .left .title{font-size:14px;font-weight:500;margin-bottom:2px}
+.toggle-row .left .desc{font-size:12px;color:var(--text-muted)}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--border-color);cursor:pointer;position:relative;transition:all .3s;flex-shrink:0}
+.toggle.on{background:var(--primary)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:all .3s}
+.toggle.on::after{left:23px}
+.btn{height:44px;padding:0 28px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--primary-glow)}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-color)}
+.btn-ghost:hover{color:var(--text-primary);border-color:var(--border-hover);background:var(--bg-elevated)}
+.btn-danger-outline{background:transparent;color:var(--danger);border:1px solid rgba(248,113,113,0.3)}
+.btn-danger-outline:hover{background:rgba(248,113,113,0.08)}
+.footer-actions{display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:18px;border-top:1px solid var(--border-color)}
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.mobile-overlay.show{display:block}.main{margin-left:0}.menu-toggle{display:flex}.content{padding:16px}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="layout">
+    <div class="mobile-overlay" :class="{show:sidebarOpen}" @click="sidebarOpen=false"></div>
+    <aside class="sidebar" :class="{open:sidebarOpen}">
+      <div class="sidebar-brand"><div class="logo"><i class="fas fa-wand-magic-sparkles"></i></div><h2>文图互转设计</h2></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section"><div class="nav-section-title">概览</div><a class="nav-item" href="dashboard.html"><i class="fas fa-grid-2"></i> 工作台</a></div>
+        <div class="nav-section"><div class="nav-section-title">创作</div><a class="nav-item" href="text2image.html"><i class="fas fa-image"></i> 文生图</a><a class="nav-item" href="image2text.html"><i class="fas fa-font"></i> 图生文</a></div>
+        <div class="nav-section"><div class="nav-section-title">管理</div><a class="nav-item" href="style_management.html"><i class="fas fa-palette"></i> 风格管理</a><a class="nav-item" href="lora_training.html"><i class="fas fa-brain"></i> LoRA训练</a></div>
+        <div class="nav-section"><div class="nav-section-title">系统</div><a class="nav-item" href="admin_dashboard.html"><i class="fas fa-gauge-high"></i> 系统概览</a><a class="nav-item" href="admin_users.html"><i class="fas fa-users-gear"></i> 用户管理</a><a class="nav-item active" href="admin_settings.html"><i class="fas fa-sliders"></i> 系统配置</a><a class="nav-item" href="admin_logs.html"><i class="fas fa-scroll"></i> 日志管理</a><a class="nav-item" href="admin_models.html"><i class="fas fa-cube"></i> 模型管理</a></div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user"><div class="avatar">张</div><div class="info"><div class="name">张明远</div><div class="role">系统管理员</div></div></div></div>
+    </aside>
+
+    <div class="main">
+      <header class="header">
+        <div class="header-left"><button class="menu-toggle" @click="sidebarOpen=!sidebarOpen"><i class="fas fa-bars"></i></button><h1 class="header-title">系统配置</h1></div>
+      </header>
+
+      <div class="content">
+        <div class="tabs">
+          <div class="tab" :class="{active:tab==='general'}" @click="tab='general'">通用设置</div>
+          <div class="tab" :class="{active:tab==='model'}" @click="tab='model'">模型配置</div>
+          <div class="tab" :class="{active:tab==='storage'}" @click="tab='storage'">存储配置</div>
+          <div class="tab" :class="{active:tab==='security'}" @click="tab='security'">安全设置</div>
+        </div>
+
+        <div v-if="tab==='general'">
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-globe"></i> 基本配置</div>
+            <div class="section-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">系统名称</label><input class="form-input" v-model="general.siteName"></div>
+                <div class="form-group"><label class="form-label">系统地址</label><input class="form-input" v-model="general.siteUrl"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">管理员邮箱</label><input class="form-input" v-model="general.adminEmail"></div>
+                <div class="form-group"><label class="form-label">默认语言</label><input class="form-input" v-model="general.language"></div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-toggle-on"></i> 功能开关</div>
+            <div class="section-body">
+              <div class="toggle-row" v-for="f in features" :key="f.key">
+                <div class="left"><div class="title">{{ f.title }}</div><div class="desc">{{ f.desc }}</div></div>
+                <div class="toggle" :class="{on:f.enabled}" @click="f.enabled=!f.enabled"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="tab==='model'">
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-microchip"></i> 生成模型配置</div>
+            <div class="section-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">默认文生图模型</label><input class="form-input" v-model="model.text2imgModel"></div>
+                <div class="form-group"><label class="form-label">默认图生文模型</label><input class="form-input" v-model="model.img2textModel"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">最大批次大小 <span class="hint">当前: {{ model.maxBatch }}</span></label><input class="form-input" type="number" v-model="model.maxBatch"></div>
+                <div class="form-group"><label class="form-label">最大推理步数 <span class="hint">当前: {{ model.maxSteps }}</span></label><input class="form-input" type="number" v-model="model.maxSteps"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">默认CFG Scale</label><input class="form-input" type="number" v-model="model.defaultCfg"></div>
+                <div class="form-group"><label class="form-label">默认采样器</label><input class="form-input" v-model="model.defaultSampler"></div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-brain"></i> LoRA训练配置</div>
+            <div class="section-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">最小训练数据量</label><input class="form-input" type="number" v-model="model.minTrainData"></div>
+                <div class="form-group"><label class="form-label">最大并发训练任务</label><input class="form-input" type="number" v-model="model.maxConcurrentTrain"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="tab==='storage'">
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-hard-drive"></i> 对象存储 (MinIO)</div>
+            <div class="section-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Endpoint</label><input class="form-input" v-model="storage.endpoint"></div>
+                <div class="form-group"><label class="form-label">Bucket</label><input class="form-input" v-model="storage.bucket"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Access Key</label><input class="form-input" type="password" v-model="storage.accessKey"></div>
+                <div class="form-group"><label class="form-label">Secret Key</label><input class="form-input" type="password" v-model="storage.secretKey"></div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-database"></i> 数据库配置</div>
+            <div class="section-body">
+              <div class="form-row full">
+                <div class="form-group"><label class="form-label">数据库连接字符串</label><input class="form-input" v-model="storage.dbUrl"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">最大连接数</label><input class="form-input" type="number" v-model="storage.maxConn"></div>
+                <div class="form-group"><label class="form-label">连接超时(秒)</label><input class="form-input" type="number" v-model="storage.connTimeout"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="tab==='security'">
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-shield-halved"></i> 安全配置</div>
+            <div class="section-body">
+              <div class="toggle-row" v-for="s in securityToggles" :key="s.key">
+                <div class="left"><div class="title">{{ s.title }}</div><div class="desc">{{ s.desc }}</div></div>
+                <div class="toggle" :class="{on:s.enabled}" @click="s.enabled=!s.enabled"></div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="section-title"><i class="fas fa-key"></i> JWT配置</div>
+            <div class="section-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Token过期时间(小时)</label><input class="form-input" type="number" v-model="security.tokenExpiry"></div>
+                <div class="form-group"><label class="form-label">刷新Token过期(天)</label><input class="form-input" type="number" v-model="security.refreshExpiry"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-actions">
+          <button class="btn btn-danger-outline" @click="resetSettings"><i class="fas fa-rotate-left"></i> 恢复默认</button>
+          <button class="btn btn-primary" @click="saveSettings"><i class="fas fa-floppy-disk"></i> 保存配置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/element-plus@2.7.0/dist/index.full.min.js"></script>
+<script>
+const{createApp,ref,reactive}=Vue;
+createApp({
+  setup(){
+    const sidebarOpen=ref(false);
+    const tab=ref('general');
+    const general=reactive({siteName:'文图互转主题设计系统',siteUrl:'https://design.example.com',adminEmail:'admin@example.com',language:'zh-CN'});
+    const features=reactive([
+      {key:'register',title:'开放注册',desc:'允许新用户自行注册账号',enabled:true},
+      {key:'guest',title:'游客模式',desc:'允许未登录用户体验基础功能',enabled:false},
+      {key:'watermark',title:'图片水印',desc:'生成图片自动添加系统水印',enabled:true},
+      {key:'nsfw',title:'内容审核',desc:'启用AI内容安全审核',enabled:true},
+      {key:'notify',title:'邮件通知',desc:'任务完成后发送邮件通知',enabled:false}
+    ]);
+    const model=reactive({text2imgModel:'stable-diffusion-xl-1.0',img2textModel:'blip2-opt-2.7b',maxBatch:16,maxSteps:50,defaultCfg:7.5,defaultSampler:'DPM++ 2M Karras',minTrainData:50,maxConcurrentTrain:2});
+    const storage=reactive({endpoint:'minio:9000',bucket:'nebula-studio',accessKey:'••••••••',secretKey:'••••••••',dbUrl:'postgresql://localhost:5432/nebula_studio',maxConn:20,connTimeout:30});
+    const security=reactive({tokenExpiry:24,refreshExpiry:7});
+    const securityToggles=reactive([
+      {key:'rateLimit',title:'API限流',desc:'限制单个用户API调用频率',enabled:true},
+      {key:'ipWhitelist',title:'IP白名单',desc:'仅允许白名单IP访问管理接口',enabled:false},
+      {key:'auditLog',title:'审计日志',desc:'记录所有管理操作的详细日志',enabled:true},
+      {key:'twoFactor',title:'双因素认证',desc:'管理员登录需二次验证',enabled:false}
+    ]);
+    const saveSettings=()=>{ElementPlus.ElMessage.success('配置已保存');};
+    const resetSettings=()=>{
+      ElementPlus.ElMessageBox.confirm('确定恢复所有配置为默认值吗？此操作不可撤销。','确认恢复',{confirmButtonText:'确认恢复',cancelButtonText:'取消',type:'warning'}).then(()=>{ElementPlus.ElMessage.success('配置已恢复默认');}).catch(()=>{});
+    };
+    return{sidebarOpen,tab,general,features,model,storage,security,securityToggles,saveSettings,resetSettings};
+  }
+}).use(ElementPlus).mount('#app');
+</script>
+</body>
+</html>

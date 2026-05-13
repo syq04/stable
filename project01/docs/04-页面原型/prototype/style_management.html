@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>风格管理 - 文图互转主题设计系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/element-plus@2.7.0/dist/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--bg-deep:#0b0f19;--bg-surface:#141824;--bg-elevated:#1c2133;--bg-hover:#232840;--border-color:#2a3045;--border-hover:#3d4560;--primary:#6366f1;--primary-light:#818cf8;--primary-glow:rgba(99,102,241,0.25);--accent:#22d3ee;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--sidebar-w:260px;--header-h:64px;--radius:12px;--radius-sm:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);height:100vh;position:fixed;left:0;top:0;background:linear-gradient(180deg,#0e1322,#111729);border-right:1px solid var(--border-color);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sidebar-brand{height:var(--header-h);display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border-color);flex-shrink:0}
+.sidebar-brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
+.sidebar-brand h2{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;white-space:nowrap}
+.sidebar-nav{flex:1;overflow-y:auto;padding:16px 12px}
+.nav-section{margin-bottom:8px}
+.nav-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:8px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);color:var(--text-secondary);font-size:13px;font-weight:500;text-decoration:none;cursor:pointer;transition:all .2s;margin-bottom:2px;position:relative}
+.nav-item i{width:18px;text-align:center;font-size:14px}
+.nav-item:hover{color:var(--text-primary);background:var(--bg-elevated)}
+.nav-item.active{color:var(--primary-light);background:rgba(99,102,241,0.1)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--primary);border-radius:0 3px 3px 0}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border-color);flex-shrink:0}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s}
+.sidebar-user:hover{background:var(--bg-elevated)}
+.sidebar-user .avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#a855f7);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600}
+.sidebar-user .info{flex:1;min-width:0}
+.sidebar-user .name{font-size:13px;font-weight:500}
+.sidebar-user .role{font-size:11px;color:var(--text-muted)}
+.main{flex:1;margin-left:var(--sidebar-w);min-height:100vh}
+.header{height:var(--header-h);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(11,15,25,0.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-color)}
+.header-left{display:flex;align-items:center;gap:16px}
+.menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:16px;cursor:pointer;align-items:center;justify-content:center}
+.header-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:600}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-btn{width:38px;height:38px;border-radius:10px;background:var(--bg-elevated);border:1px solid var(--border-color);color:var(--text-secondary);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.header-btn:hover{color:var(--text-primary);border-color:var(--border-hover)}
+.content{padding:28px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.toolbar-left{display:flex;align-items:center;gap:12px}
+.search-box{position:relative}
+.search-box input{width:240px;height:40px;padding:0 14px 0 38px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;font-family:inherit;outline:none;transition:all .25s}
+.search-box input::placeholder{color:var(--text-muted)}
+.search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.search-box i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px}
+.btn{height:40px;padding:0 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--primary-glow)}
+.style-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.style-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius);overflow:hidden;transition:all .25s}
+.style-card:hover{border-color:var(--border-hover);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.25)}
+.style-card .banner{height:120px;position:relative;overflow:hidden}
+.style-card .banner .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,15,25,0.8) 0%,transparent 60%)}
+.style-card .banner .name-overlay{position:absolute;bottom:12px;left:16px;font-family:'Sora',sans-serif;font-size:18px;font-weight:600}
+.style-card .banner .status-dot{position:absolute;top:12px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--success)}
+.style-card .body{padding:16px}
+.style-card .body .desc{font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.style-card .body .config-preview{background:var(--bg-elevated);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--text-muted);font-family:monospace;line-height:1.6;margin-bottom:14px}
+.style-card .body .meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-muted)}
+.style-card .body .meta .count{display:flex;align-items:center;gap:4px}
+.style-card .actions{display:flex;border-top:1px solid var(--border-color)}
+.style-card .actions button{flex:1;height:40px;background:transparent;border:none;color:var(--text-muted);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.style-card .actions button:hover{color:var(--text-primary);background:var(--bg-elevated)}
+.style-card .actions button+button{border-left:1px solid var(--border-color)}
+.style-card .actions button.del:hover{color:var(--danger);background:rgba(248,113,113,0.05)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{width:560px;max-width:94vw;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius);animation:modalIn .3s cubic-bezier(.16,1,.3,1);max-height:90vh;overflow-y:auto}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-color);position:sticky;top:0;background:var(--bg-surface);z-index:1}
+.modal-header h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:600}
+.modal-close{width:32px;height:32px;border-radius:8px;background:transparent;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.modal-body{padding:24px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border-color);position:sticky;bottom:0;background:var(--bg-surface)}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:7px}
+.form-input{width:100%;height:44px;padding:0 14px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;transition:all .25s}
+.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.form-input::placeholder{color:var(--text-muted)}
+textarea.form-input{height:auto;min-height:80px;padding:12px 14px;resize:vertical;line-height:1.6}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-color)}
+.btn-ghost:hover{color:var(--text-primary);border-color:var(--border-hover);background:var(--bg-elevated)}
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.mobile-overlay.show{display:block}.main{margin-left:0}.menu-toggle{display:flex}.content{padding:16px}.style-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="layout">
+    <div class="mobile-overlay" :class="{show:sidebarOpen}" @click="sidebarOpen=false"></div>
+    <aside class="sidebar" :class="{open:sidebarOpen}">
+      <div class="sidebar-brand"><div class="logo"><i class="fas fa-wand-magic-sparkles"></i></div><h2>文图互转设计</h2></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section"><div class="nav-section-title">概览</div><a class="nav-item" href="dashboard.html"><i class="fas fa-grid-2"></i> 工作台</a></div>
+        <div class="nav-section"><div class="nav-section-title">创作</div><a class="nav-item" href="text2image.html"><i class="fas fa-image"></i> 文生图</a><a class="nav-item" href="image2text.html"><i class="fas fa-font"></i> 图生文</a></div>
+        <div class="nav-section"><div class="nav-section-title">管理</div><a class="nav-item active" href="style_management.html"><i class="fas fa-palette"></i> 风格管理</a><a class="nav-item" href="lora_training.html"><i class="fas fa-brain"></i> LoRA训练</a></div>
+        <div class="nav-section"><div class="nav-section-title">系统</div><a class="nav-item" href="admin_dashboard.html"><i class="fas fa-gauge-high"></i> 系统概览</a><a class="nav-item" href="admin_users.html"><i class="fas fa-users-gear"></i> 用户管理</a><a class="nav-item" href="admin_settings.html"><i class="fas fa-sliders"></i> 系统配置</a><a class="nav-item" href="admin_logs.html"><i class="fas fa-scroll"></i> 日志管理</a><a class="nav-item" href="admin_models.html"><i class="fas fa-cube"></i> 模型管理</a></div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user"><div class="avatar">张</div><div class="info"><div class="name">张明远</div><div class="role">系统管理员</div></div></div></div>
+    </aside>
+
+    <div class="main">
+      <header class="header">
+        <div class="header-left"><button class="menu-toggle" @click="sidebarOpen=!sidebarOpen"><i class="fas fa-bars"></i></button><h1 class="header-title">风格管理</h1></div>
+        <div class="header-right"><button class="header-btn"><i class="fas fa-bell"></i></button></div>
+      </header>
+
+      <div class="content">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><i class="fas fa-search"></i><input v-model="keyword" placeholder="搜索风格名称..."></div>
+          </div>
+          <button class="btn btn-primary" @click="openCreate"><i class="fas fa-plus"></i> 创建风格</button>
+        </div>
+
+        <div class="style-grid">
+          <div class="style-card" v-for="s in filteredStyles" :key="s.id">
+            <div class="banner" :style="{background:s.gradient}">
+              <div class="overlay"></div>
+              <div class="name-overlay">{{ s.name }}</div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="body">
+              <div class="desc">{{ s.description }}</div>
+              <div class="config-preview">{{ s.configPreview }}</div>
+              <div class="meta">
+                <span>{{ s.createdAt }}</span>
+                <span class="count"><i class="fas fa-image"></i> {{ s.useCount }} 次使用</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button @click="previewStyle(s)"><i class="fas fa-eye"></i> 预览</button>
+              <button @click="openEdit(s)"><i class="fas fa-pen"></i> 编辑</button>
+              <button class="del" @click="confirmDelete(s)"><i class="fas fa-trash"></i> 删除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" v-if="showModal" @click.self="showModal=false">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>{{ isEdit?'编辑风格':'创建风格' }}</h3>
+        <button class="modal-close" @click="showModal=false"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">风格名称</label><input class="form-input" v-model="form.name" placeholder="输入风格名称"></div>
+        <div class="form-group"><label class="form-label">风格描述</label><textarea class="form-input" v-model="form.description" placeholder="描述风格特点"></textarea></div>
+        <div class="form-group"><label class="form-label">正面提示词 (Prompt)</label><textarea class="form-input" v-model="form.prompt" placeholder="输入正面提示词"></textarea></div>
+        <div class="form-group"><label class="form-label">负面提示词 (Negative Prompt)</label><textarea class="form-input" v-model="form.negativePrompt" placeholder="输入负面提示词"></textarea></div>
+        <div class="form-group"><label class="form-label">默认步数</label><input class="form-input" type="number" v-model="form.steps" placeholder="20"></div>
+        <div class="form-group"><label class="form-label">默认CFG比例</label><input class="form-input" type="number" v-model="form.cfgScale" step="0.5" placeholder="7.5"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" @click="showModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveStyle">{{ isEdit?'保存':'创建' }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/element-plus@2.7.0/dist/index.full.min.js"></script>
+<script>
+const{createApp,ref,reactive,computed}=Vue;
+createApp({
+  setup(){
+    const sidebarOpen=ref(false);
+    const keyword=ref('');
+    const showModal=ref(false);
+    const isEdit=ref(false);
+    const form=reactive({id:null,name:'',description:'',prompt:'',negativePrompt:'',steps:20,cfgScale:7.5});
+
+    const styles=reactive([
+      {id:1,name:'赛博朋克',description:'未来科技感风格，霓虹灯光与暗色系搭配，适合科幻主题创作',gradient:'linear-gradient(135deg,#6366f1,#ec4899)',configPreview:'prompt: cyberpunk, neon lights... | steps: 20 | cfg: 7.5',useCount:42,createdAt:'2026-03-15'},
+      {id:2,name:'水墨丹青',description:'中国传统水墨画风格，留白意境，淡雅素净，适合国风创作',gradient:'linear-gradient(135deg,#1e293b,#475569)',configPreview:'prompt: ink wash painting, chinese... | steps: 25 | cfg: 8',useCount:38,createdAt:'2026-03-20'},
+      {id:3,name:'日系清新',description:'日系小清新风格，柔和色调，自然光线，适合人像和风景',gradient:'linear-gradient(135deg,#f472b6,#fbbf24)',configPreview:'prompt: japanese fresh style... | steps: 20 | cfg: 7',useCount:35,createdAt:'2026-04-01'},
+      {id:4,name:'电商白底',description:'电商产品展示风格，纯白背景，专业灯光，突出产品细节',gradient:'linear-gradient(135deg,#94a3b8,#e2e8f0)',configPreview:'prompt: product photo, white bg... | steps: 25 | cfg: 8.5',useCount:28,createdAt:'2026-04-10'},
+      {id:5,name:'写实风格',description:'高保真写实风格，照片级真实感，细节丰富，适合写实创作',gradient:'linear-gradient(135deg,#059669,#0d9488)',configPreview:'prompt: photorealistic, detailed... | steps: 30 | cfg: 7.5',useCount:24,createdAt:'2026-04-18'},
+      {id:6,name:'油画质感',description:'经典油画风格，厚重笔触，丰富色彩层次，适合艺术创作',gradient:'linear-gradient(135deg,#92400e,#b45309)',configPreview:'prompt: oil painting, rich colors... | steps: 25 | cfg: 9',useCount:19,createdAt:'2026-05-01'}
+    ]);
+
+    const filteredStyles=computed(()=>styles.filter(s=>!keyword.value||s.name.includes(keyword.value)));
+
+    const openCreate=()=>{isEdit.value=false;Object.assign(form,{id:null,name:'',description:'',prompt:'',negativePrompt:'',steps:20,cfgScale:7.5});showModal.value=true;};
+    const openEdit=(s)=>{isEdit.value=true;Object.assign(form,{id:s.id,name:s.name,description:s.description,prompt:'',negativePrompt:'',steps:20,cfgScale:7.5});showModal.value=true;};
+    const saveStyle=()=>{
+      if(!form.name){ElementPlus.ElMessage.warning('请输入风格名称');return;}
+      if(isEdit.value){const s=styles.find(x=>x.id===form.id);if(s){s.name=form.name;s.description=form.description;}ElementPlus.ElMessage.success('风格已更新');}
+      else{styles.push({id:Date.now(),name:form.name,description:form.description,gradient:'linear-gradient(135deg,#6366f1,#8b5cf6)',configPreview:`prompt: ${form.prompt.substring(0,30)}... | steps: ${form.steps} | cfg: ${form.cfgScale}`,useCount:0,createdAt:'2026-05-10'});ElementPlus.ElMessage.success('风格已创建');}
+      showModal.value=false;
+    };
+    const previewStyle=(s)=>{ElementPlus.ElMessage.info('预览风格：'+s.name);};
+    const confirmDelete=(s)=>{
+      ElementPlus.ElMessageBox.confirm(`确定删除风格「${s.name}」吗？`,'删除确认',{confirmButtonText:'删除',cancelButtonText:'取消',type:'warning'}).then(()=>{
+        const idx=styles.findIndex(x=>x.id===s.id);if(idx>-1)styles.splice(idx,1);ElementPlus.ElMessage.success('已删除');
+      }).catch(()=>{});
+    };
+
+    return{sidebarOpen,keyword,showModal,isEdit,form,styles,filteredStyles,openCreate,openEdit,saveStyle,previewStyle,confirmDelete};
+  }
+}).use(ElementPlus).mount('#app');
+</script>
+</body>
+</html>
