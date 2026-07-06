@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 import router from '@/router'
 
 const request = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
   timeout: 120000,
   headers: { 'Content-Type': 'application/json' }
 })
@@ -21,6 +21,9 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
   (response) => {
+    if (response.config.responseType === 'blob') {
+      return response.data
+    }
     const res = response.data
     if (res.code !== 200) {
       ElMessage.error(res.message || '请求失败')

@@ -79,13 +79,8 @@ public class AiServiceController {
 
     private String getProviderMessage(String name, boolean available) {
         return switch (name) {
-            case "pollinations" -> available ? "Pollinations.ai 免费服务已连接" : "Pollinations.ai 服务不可用";
-            case "huggingface" -> available ? "HuggingFace 推理服务已连接" : "HuggingFace API Key 未配置或服务不可用";
-            case "stable-diffusion" -> available ? "Stable Diffusion WebUI 已连接" : "Stable Diffusion WebUI 未启用或不可用";
-            case "comfyui" -> available ? "ComfyUI 已连接" : "ComfyUI 未启用或不可用";
-            case "doubao" -> available ? "豆包视觉大模型已连接" : "豆包 API Key 未配置或服务不可用";
-            case "gemini" -> available ? "Google Gemini 视觉服务已连接" : "Gemini API Key 未配置或服务不可用";
-            case "mock" -> "模拟模式（无需AI服务）";
+            case "local-model" -> available ? "本地模型推理服务已连接" : "本地模型推理服务不可用";
+            case "qwen" -> available ? "千问 API 已配置" : "千问 API Key 未配置";
             default -> available ? name + " 服务已连接" : name + " 服务不可用";
         };
     }

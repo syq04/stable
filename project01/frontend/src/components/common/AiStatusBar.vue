@@ -1,5 +1,6 @@
 <template>
   <div class="ai-status-bar">
+    <template v-if="!hideT2I">
     <div class="provider-section">
       <div class="section-label">
         <el-icon><PictureFilled /></el-icon>
@@ -27,36 +28,39 @@
         </el-option>
       </el-select>
     </div>
+    </template>
 
-    <div class="status-divider"></div>
+    <template v-if="!hideI2T">
+      <div class="status-divider"></div>
 
-    <div class="provider-section">
-      <div class="section-label">
-        <el-icon><View /></el-icon>
-        <span>图生文</span>
-      </div>
-      <el-select
-        v-model="activeI2T"
-        size="small"
-        class="provider-select"
-        @change="handleSwitchI2T"
-      >
-        <el-option
-          v-for="p in i2tList"
-          :key="p.name"
-          :label="getProviderLabel(p)"
-          :value="p.name"
-          :disabled="!p.available"
+      <div class="provider-section">
+        <div class="section-label">
+          <el-icon><View /></el-icon>
+          <span>图生文</span>
+        </div>
+        <el-select
+          v-model="activeI2T"
+          size="small"
+          class="provider-select"
+          @change="handleSwitchI2T"
         >
-          <div class="provider-option">
-            <span>{{ getProviderDisplayName(p.name) }}</span>
-            <el-tag :type="p.available ? 'success' : 'info'" size="small" effect="dark" round>
-              {{ p.available ? '可用' : '不可用' }}
-            </el-tag>
-          </div>
-        </el-option>
-      </el-select>
-    </div>
+          <el-option
+            v-for="p in i2tList"
+            :key="p.name"
+            :label="getProviderLabel(p)"
+            :value="p.name"
+            :disabled="!p.available"
+          >
+            <div class="provider-option">
+              <span>{{ getProviderDisplayName(p.name) }}</span>
+              <el-tag :type="p.available ? 'success' : 'info'" size="small" effect="dark" round>
+                {{ p.available ? '可用' : '不可用' }}
+              </el-tag>
+            </div>
+          </el-option>
+        </el-select>
+      </div>
+    </template>
 
     <el-button
       class="refresh-btn"
@@ -75,6 +79,11 @@ import { PictureFilled, View, Refresh } from '@element-plus/icons-vue'
 import { useAiStore } from '@/stores/ai'
 
 const aiStore = useAiStore()
+
+defineProps({
+  hideI2T: { type: Boolean, default: false },
+  hideT2I: { type: Boolean, default: false }
+})
 
 const activeT2I = ref('')
 const activeI2T = ref('')
@@ -100,16 +109,8 @@ function handleSwitchI2T(val) {
 
 function getProviderDisplayName(name) {
   const map = {
-    'pollinations': 'Pollinations.ai',
-    'huggingface': 'HuggingFace',
-    'stable-diffusion': 'Stable Diffusion',
-    'doubao': '豆包视觉',
-    'gemini': 'Google Gemini',
-    'openrouter': 'OpenRouter',
-    'siliconflow': '硅基流动',
-    'zhipu': '智谱AI',
-    'comfyui': 'ComfyUI',
-    'mock': '模拟模式'
+    'local-model': '本地模型',
+    'qwen': '千问'
   }
   return map[name] || name
 }

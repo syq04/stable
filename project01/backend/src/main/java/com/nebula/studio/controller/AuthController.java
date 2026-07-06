@@ -42,7 +42,7 @@ public class AuthController {
 
     @PutMapping("/user/profile")
     public Result<User> updateProfile(@AuthenticationPrincipal JwtUserDetails userDetails,
-                                      @RequestBody UpdateUserRequest request) {
+                                      @Valid @RequestBody UpdateUserRequest request) {
         return Result.success(userService.updateProfile(userDetails.getUserId(), request));
     }
 
@@ -77,7 +77,7 @@ public class AuthController {
 
     @PutMapping("/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Result<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+    public Result<User> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
         return Result.success(userService.updateUser(id, request));
     }
 

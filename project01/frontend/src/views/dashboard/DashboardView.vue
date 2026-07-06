@@ -32,27 +32,39 @@
           <el-icon :size="28"><Brush /></el-icon>
           <span>风格管理</span>
         </router-link>
-        <router-link to="/lora" class="action-card" v-if="userStore.isDesigner">
-          <el-icon :size="28"><Cpu /></el-icon>
-          <span>LoRA训练</span>
-        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { getDashboardStats } from '@/api/dashboard'
 
 const userStore = useUserStore()
 
 const stats = ref([
   { label: '文生图次数', value: 0, icon: 'Picture', color: '#818cf8', bg: 'rgba(99,102,241,0.12)' },
   { label: '图生文次数', value: 0, icon: 'EditPen', color: '#22d3ee', bg: 'rgba(34,211,238,0.1)' },
-  { label: '自定义风格', value: 0, icon: 'Brush', color: '#34d399', bg: 'rgba(52,211,153,0.1)' },
-  { label: '训练任务', value: 0, icon: 'Cpu', color: '#fbbf24', bg: 'rgba(251,191,36,0.1)' }
+  { label: '自定义风格', value: 0, icon: 'Brush', color: '#34d399', bg: 'rgba(52,211,153,0.1)' }
 ])
+
+async function fetchStats() {
+  try {
+    const res = await getDashboardStats()
+    const data = res.data
+    if (data) {
+      stats.value[0].value = data.text2ImageCount || 0
+      stats.value[1].value = data.image2TextCount || 0
+      stats.value[2].value = data.styleCount || 0
+    }
+  } catch {
+    console.error('Failed to fetch dashboard stats')
+  }
+}
+
+onMounted(fetchStats)
 </script>
 
 <style scoped>

@@ -55,39 +55,6 @@ CREATE TABLE IF NOT EXISTS `style` (
     KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='风格表';
 
-CREATE TABLE IF NOT EXISTS `training_task` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '任务ID',
-    `user_id` BIGINT NOT NULL COMMENT '用户ID',
-    `name` VARCHAR(128) NOT NULL COMMENT '任务名称',
-    `status` VARCHAR(32) NOT NULL DEFAULT 'PENDING' COMMENT '状态: PENDING/RUNNING/COMPLETED/FAILED',
-    `params` TEXT COMMENT '训练参数(JSON)',
-    `data_path` VARCHAR(512) COMMENT '训练数据路径',
-    `model_path` VARCHAR(512) COMMENT '模型输出路径',
-    `progress` FLOAT DEFAULT 0 COMMENT '训练进度',
-    `logs` LONGTEXT COMMENT '训练日志',
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `started_at` DATETIME COMMENT '开始时间',
-    `completed_at` DATETIME COMMENT '完成时间',
-    `created_by` BIGINT NOT NULL COMMENT '创建人ID',
-    PRIMARY KEY (`id`),
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='训练任务表';
-
-CREATE TABLE IF NOT EXISTS `lora_model` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '模型ID',
-    `task_id` BIGINT NOT NULL COMMENT '训练任务ID',
-    `name` VARCHAR(128) NOT NULL COMMENT '模型名称',
-    `file_path` VARCHAR(512) NOT NULL COMMENT '模型文件路径',
-    `version` VARCHAR(32) DEFAULT '1.0.0' COMMENT '版本号',
-    `status` VARCHAR(32) DEFAULT 'ACTIVE' COMMENT '状态: ACTIVE, INACTIVE',
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `created_by` BIGINT NOT NULL COMMENT '创建人ID',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_model_name` (`name`),
-    KEY `idx_task_id` (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LoRA模型表';
-
 CREATE TABLE IF NOT EXISTS `system_config` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '配置ID',
     `config_key` VARCHAR(128) NOT NULL COMMENT '配置键',
@@ -118,23 +85,5 @@ CREATE TABLE IF NOT EXISTS `audit_log` (
     KEY `idx_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='审计日志表';
 
-INSERT INTO `user` (`username`, `email`, `password_hash`, `role`, `created_by`) VALUES
-('admin', 'admin@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.IjzqAKL9xL5jvMFVdNJHvGCgTq/VEq', 'ADMIN', 1),
-('designer', 'designer@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.IjzqAKL9xL5jvMFVdNJHvGCgTq/VEq', 'DESIGNER', 1);
-
-INSERT INTO `system_config` (`config_key`, `config_value`, `description`) VALUES
-('app.name', '文图互转主题设计系统', '系统名称'),
-('app.version', '1.0.0', '系统版本'),
-('ai.sd.api.url', 'http://localhost:7860', 'Stable Diffusion API地址'),
-('ai.doubao.api.url', 'https://api.doubao.com', '豆包API地址'),
-('storage.minio.url', 'http://localhost:9000', 'MinIO存储地址'),
-('storage.minio.bucket', 'ai-content', 'MinIO存储桶名称'),
-('security.jwt.expire-hours', '24', 'JWT过期时间(小时)'),
-('training.default.epochs', '10', '默认训练轮数'),
-('training.default.batch-size', '8', '默认批次大小');
-
-INSERT INTO `style` (`designer_id`, `name`, `description`, `config`, `status`, `created_by`) VALUES
-(2, '写实风格', '真实感强的图像风格，适合产品展示、人物肖像等场景', '{"prompt": "realistic, photorealistic, high detail", "negative_prompt": "cartoon, anime, drawing"}', 'ACTIVE', 2),
-(2, '插画风格', '艺术插画风格，色彩丰富，适合宣传海报、社交媒体配图', '{"prompt": "illustration, colorful, artistic, painting style", "negative_prompt": "photorealistic, realistic"}', 'ACTIVE', 2),
-(2, '极简风格', '简约现代风格，线条简洁，适合UI设计、品牌素材', '{"prompt": "minimalist, clean, modern design, simple", "negative_prompt": "complex, cluttered"}', 'ACTIVE', 2),
-(2, '复古风格', '怀旧复古风格，带有年代感，适合复古主题内容', '{"prompt": "vintage, retro, nostalgic, classic style", "negative_prompt": "modern, futuristic"}', 'ACTIVE', 2);
+-- Seed data is initialized by DataInitializer.java at application startup.
+-- See com.nebula.studio.config.DataInitializer for default users, styles, and configs.

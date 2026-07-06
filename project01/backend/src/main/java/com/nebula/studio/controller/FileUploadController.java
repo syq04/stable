@@ -54,11 +54,13 @@ public class FileUploadController {
             // 获取上传目录（自动创建）
             Path uploadPath = getUploadPath();
 
-            // 生成唯一文件名
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+                if (!extension.matches("\\.(jpg|jpeg|png|gif|webp|bmp|svg)")) {
+                    return Result.error("不支持的文件类型");
+                }
             }
             String filename = UUID.randomUUID().toString() + extension;
             Path filePath = uploadPath.resolve(filename);

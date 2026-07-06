@@ -35,64 +35,59 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initAdminUser() {
-        if (userMapper.selectById(1L) == null) {
+        if (userMapper.selectByEmail("admin@nebula.com") == null) {
             User admin = new User();
-            admin.setId(1L);
             admin.setUsername("admin");
             admin.setEmail("admin@nebula.com");
             admin.setPasswordHash(passwordEncoder.encode("admin123"));
             admin.setRole("ADMIN");
             admin.setCreatedBy(0L);
             userMapper.insert(admin);
-            log.info("Admin user created: admin@nebula.com / admin123");
+            log.info("Admin user created: admin@nebula.com");
         }
     }
 
     private void initDesignerUser() {
-        if (userMapper.selectById(2L) == null) {
+        if (userMapper.selectByEmail("designer@nebula.com") == null) {
             User designer = new User();
-            designer.setId(2L);
             designer.setUsername("designer");
             designer.setEmail("designer@nebula.com");
             designer.setPasswordHash(passwordEncoder.encode("designer123"));
             designer.setRole("DESIGNER");
             designer.setCreatedBy(0L);
             userMapper.insert(designer);
-            log.info("Designer user created: designer@nebula.com / designer123");
+            log.info("Designer user created: designer@nebula.com");
         }
     }
 
     private void initNormalUser() {
-        if (userMapper.selectById(3L) == null) {
+        if (userMapper.selectByEmail("user@nebula.com") == null) {
             User user = new User();
-            user.setId(3L);
             user.setUsername("user");
             user.setEmail("user@nebula.com");
             user.setPasswordHash(passwordEncoder.encode("user123"));
             user.setRole("USER");
             user.setCreatedBy(0L);
             userMapper.insert(user);
-            log.info("Normal user created: user@nebula.com / user123");
+            log.info("Normal user created: user@nebula.com");
         }
     }
 
     private void initSystemConfigs() {
-        List<String> keys = List.of("app.name", "app.version", "ai.sd.api.url",
-                "ai.doubao.api.url", "ai.openrouter.api-key", "ai.gemini.api-key",
-                "ai.huggingface.api-key", "ai.siliconflow.api-key", "ai.zhipu.api-key",
+        List<String> keys = List.of("app.name", "app.version",
+                "ai.local-model.api-url", "ai.local-model.model-dir",
+                "ai.qwen.api-key", "ai.qwen.api-url", "ai.qwen.model",
                 "storage.minio.url", "storage.minio.bucket",
                 "security.jwt.expire-hours", "training.default.epochs", "training.default.batch-size");
 
         List<String[]> configs = List.of(
                 new String[]{"app.name", "文图互转主题设计系统", "系统名称"},
                 new String[]{"app.version", "1.0.0", "系统版本"},
-                new String[]{"ai.sd.api.url", "http://localhost:7860", "Stable Diffusion API地址"},
-                new String[]{"ai.doubao.api.url", "https://api.doubao.com", "豆包API地址"},
-                new String[]{"ai.openrouter.api-key", "", "OpenRouter API Key（免费视觉模型）"},
-                new String[]{"ai.gemini.api-key", "", "Google Gemini API Key"},
-                new String[]{"ai.huggingface.api-key", "", "HuggingFace API Key"},
-                new String[]{"ai.siliconflow.api-key", "", "硅基流动 API Key（国内免费文生图，推荐）"},
-                new String[]{"ai.zhipu.api-key", "", "智谱AI API Key（国内免费文生图+图生文，推荐）"},
+                new String[]{"ai.local-model.api-url", "http://127.0.0.1:5000", "本地模型推理服务地址"},
+                new String[]{"ai.local-model.model-dir", "../sd-models", "safetensors 模型存放目录"},
+                new String[]{"ai.qwen.api-key", "", "千问 API Key"},
+                new String[]{"ai.qwen.api-url", "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", "千问 API 地址"},
+                new String[]{"ai.qwen.model", "qwen3.5-omni-plus", "千问 模型名称"},
                 new String[]{"storage.minio.url", "http://localhost:9000", "MinIO存储地址"},
                 new String[]{"storage.minio.bucket", "ai-content", "MinIO存储桶名称"},
                 new String[]{"security.jwt.expire-hours", "24", "JWT过期时间(小时)"},
@@ -100,15 +95,18 @@ public class DataInitializer implements CommandLineRunner {
                 new String[]{"training.default.batch-size", "8", "默认批次大小"}
         );
 
+        java.util.Set<String> existingKeys = new java.util.HashSet<>();
+        systemConfigMapper.selectList(null).forEach(c -> existingKeys.add(c.getConfigKey()));
+
         for (String[] cfg : configs) {
-            if (systemConfigMapper.selectList(null).stream()
-                    .noneMatch(c -> cfg[0].equals(c.getConfigKey()))) {
+            if (!existingKeys.contains(cfg[0])) {
                 SystemConfig config = new SystemConfig();
                 config.setConfigKey(cfg[0]);
                 config.setConfigValue(cfg[1]);
                 config.setDescription(cfg[2]);
                 config.setCreatedBy(1L);
                 systemConfigMapper.insert(config);
+                existingKeys.add(cfg[0]);
             }
         }
     }

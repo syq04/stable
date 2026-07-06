@@ -62,12 +62,6 @@ const routes = [
         meta: { title: '风格管理', roles: ['DESIGNER', 'ADMIN'] }
       },
       {
-        path: 'lora',
-        name: 'LoraTraining',
-        component: () => import('@/views/lora/LoraTrainingView.vue'),
-        meta: { title: 'LoRA训练', roles: ['DESIGNER', 'ADMIN'] }
-      },
-      {
         path: 'admin',
         name: 'AdminDashboard',
         component: () => import('@/views/admin/AdminDashboardView.vue'),
@@ -90,14 +84,22 @@ const routes = [
         name: 'AdminLogs',
         component: () => import('@/views/admin/AdminLogsView.vue'),
         meta: { title: '日志管理', roles: ['ADMIN'] }
-      },
-      {
-        path: 'admin/models',
-        name: 'AdminModels',
-        component: () => import('@/views/admin/AdminModelsView.vue'),
-        meta: { title: '模型管理', roles: ['ADMIN'] }
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/auth/LoginView.vue'),
+    meta: { requiresAuth: false, title: '页面未找到' },
+    beforeEnter: (to, from, next) => {
+      const userStore = useUserStore()
+      if (userStore.isLoggedIn) {
+        next({ name: 'Dashboard' })
+      } else {
+        next({ name: 'Login' })
+      }
+    }
   }
 ]
 
@@ -119,21 +121,19 @@ router.beforeEach(async (to, from, next) => {
       try {
         await userStore.fetchProfile()
       } catch {
+        console.error('Failed to fetch user profile, logging out')
         userStore.clearAuth()
         next({ name: 'Login' })
         return
       }
     }
-    const requiredRoles = to.meta.roles
-    if (requiredRoles && !requiredRoles.includes(userStore.userInfo.role)) {
-      next({ name: 'Dashboard' })
-      return
+    if (userStore.userInfo) {
+      const requiredRoles = to.meta.roles
+      if (requiredRoles && !requiredRoles.includes(userStore.userInfo.role)) {
+        next({ name: 'Dashboard' })
+        return
+      }
     }
-  }
-
-  if (to.meta.requiresAuth === false && to.name !== 'Login' && to.name !== 'Register') {
-    next()
-    return
   }
 
   next()

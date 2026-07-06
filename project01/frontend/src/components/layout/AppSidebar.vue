@@ -28,9 +28,6 @@
         <router-link to="/styles" class="nav-item" active-class="active" @click="$emit('close')">
           <el-icon><Brush /></el-icon> 风格管理
         </router-link>
-        <router-link to="/lora" class="nav-item" active-class="active" @click="$emit('close')">
-          <el-icon><Cpu /></el-icon> LoRA训练
-        </router-link>
       </div>
 
       <div v-if="userStore.isAdmin" class="nav-section">
@@ -46,9 +43,6 @@
         </router-link>
         <router-link to="/admin/logs" class="nav-item" active-class="active" @click="$emit('close')">
           <el-icon><Document /></el-icon> 日志管理
-        </router-link>
-        <router-link to="/admin/models" class="nav-item" active-class="active" @click="$emit('close')">
-          <el-icon><Box /></el-icon> 模型管理
         </router-link>
       </div>
     </nav>
@@ -163,6 +157,10 @@ const roleLabel = computed(() => {
   background: var(--bg-elevated);
 }
 
+.nav-item.sub {
+  padding-left: 36px;
+  font-size: 12px;
+}
 .nav-item.active {
   color: var(--primary-light);
   background: rgba(99, 102, 241, 0.1);

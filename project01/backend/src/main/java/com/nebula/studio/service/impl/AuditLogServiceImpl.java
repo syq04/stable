@@ -55,13 +55,21 @@ public class AuditLogServiceImpl extends ServiceImpl<AuditLogMapper, AuditLog> i
         sb.append("ID,操作类型,目标类型,目标ID,操作人ID,IP地址,操作时间\n");
         list(wrapper).forEach(log -> {
             sb.append(log.getId()).append(",")
-              .append(log.getOperationType()).append(",")
-              .append(log.getTargetType()).append(",")
+              .append(escapeCsv(log.getOperationType())).append(",")
+              .append(escapeCsv(log.getTargetType())).append(",")
               .append(log.getTargetId() != null ? log.getTargetId() : "").append(",")
               .append(log.getOperatorId() != null ? log.getOperatorId() : "").append(",")
-              .append(log.getIpAddress() != null ? log.getIpAddress() : "").append(",")
+              .append(escapeCsv(log.getIpAddress())).append(",")
               .append(log.getCreatedAt()).append("\n");
         });
         return sb.toString();
+    }
+
+    private String escapeCsv(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
     }
 }

@@ -94,7 +94,7 @@ async function handleExport() {
   try {
     const data = { operationType: operationType.value || undefined, targetType: targetType.value || undefined }
     const res = await exportSystemLogs(data)
-    const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8' })
+    const blob = new Blob([res], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

@@ -8,8 +8,6 @@ import java.util.Map;
 @Data
 public class AiServiceStatusVO {
 
-    private ServiceInfo stableDiffusion;
-    private ServiceInfo doubaoVision;
     private Map<String, ServiceInfo> text2ImageProviders = new LinkedHashMap<>();
     private Map<String, ServiceInfo> image2TextProviders = new LinkedHashMap<>();
     private String activeText2ImageProvider;

@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-header">
         <h3><el-icon><Clock /></el-icon> 图生文历史</h3>
-        <el-input v-model="search" placeholder="搜索..." prefix-icon="Search" clearable style="width:240px" />
+        <el-input v-model="search" placeholder="搜索..." prefix-icon="Search" clearable style="width:240px" @clear="fetchData" @keyup.enter="fetchData" />
       </div>
       <div class="card-body">
         <el-table :data="records" stripe v-loading="loading" style="width:100%">

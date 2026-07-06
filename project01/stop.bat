@@ -1,30 +1,52 @@
 @echo off
 chcp 65001 >nul 2>&1
-title Nebula Studio - 停止
+setlocal enabledelayedexpansion
+title Nebula Studio - Stop All
+
+set "ROOT=%~dp0"
 
 echo ============================================
-echo   Nebula Studio - 停止服务
+echo   Nebula Studio - Stop All Services
 echo ============================================
 echo.
 
-:: 停止后端 (端口 8080)
-echo [1/2] 停止后端服务 (端口 8080)...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8080 " ^| findstr "LISTENING"') do (
-    echo   终止进程 PID: %%a
-    taskkill /PID %%a /F >nul 2>&1
-)
+echo [*] Inference Service (5000)...
+call :kill_port 5000
 
-:: 停止前端 (端口 3000)
-echo [2/2] 停止前端服务 (端口 3000)...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3000 " ^| findstr "LISTENING"') do (
-    echo   终止进程 PID: %%a
-    taskkill /PID %%a /F >nul 2>&1
-)
+echo [*] Backend (8080)...
+call :kill_port 8080
+taskkill /FI "IMAGENAME eq java.exe" /F >nul 2>&1
+del /f "%ROOT%backend\data\nebula_studio.lock.db" 2>nul
 
-:: 也尝试通过窗口标题关闭
-taskkill /FI "WINDOWTITLE eq Nebula-Backend*" /F >nul 2>&1
-taskkill /FI "WINDOWTITLE eq Nebula-Frontend*" /F >nul 2>&1
+echo [*] Frontend (3000)...
+call :kill_port 3000
+
+echo [*] Frontend alt (3001)...
+call :kill_port 3001
+
+echo [*] Window title cleanup...
+taskkill /FI "WINDOWTITLE eq InferenceService*" /F >nul 2>&1
+taskkill /FI "WINDOWTITLE eq Nebula-Backend*"   /F >nul 2>&1
+taskkill /FI "WINDOWTITLE eq Nebula-Frontend*"  /F >nul 2>&1
 
 echo.
-echo 所有服务已停止。
-pause
+echo ============================================
+echo   All services stopped.
+echo ============================================
+timeout /t 2 /nobreak >nul 2>&1
+exit /b 0
+
+:kill_port
+set "port=%~1"
+set "killed=0"
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr /c:":%port% " ^| findstr /c:"LISTENING"') do (
+    echo   Killing PID %%a on port %port%
+    taskkill /f /pid %%a >nul 2>&1
+    if not errorlevel 1 set /a killed+=1
+)
+if not "!killed!"=="0" (
+    echo   Killed !killed! processes
+) else (
+    echo   No process found
+)
+exit /b 0

@@ -69,7 +69,8 @@ async function handleSubmit() {
     await updatePassword(form)
     ElMessage.success('密码修改成功，请重新登录')
     userStore.logout()
-  } catch {
+  } catch (e) {
+    ElMessage.error(e?.message || '密码修改失败')
   } finally {
     loading.value = false
   }

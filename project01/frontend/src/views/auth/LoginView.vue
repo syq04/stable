@@ -61,8 +61,8 @@ const formRef = ref(null)
 const loading = ref(false)
 
 const form = reactive({
-  email: 'admin@nebula.com',
-  password: 'admin123'
+  email: '',
+  password: ''
 })
 
 function fillAccount(email, password) {
@@ -91,7 +91,8 @@ async function handleLogin() {
     ElMessage.success('登录成功')
     const redirect = route.query.redirect || '/'
     router.push(redirect)
-  } catch {
+  } catch (e) {
+    ElMessage.error(e?.message || '登录失败，请检查账号密码')
   } finally {
     loading.value = false
   }

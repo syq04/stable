@@ -86,7 +86,8 @@ async function handleRegister() {
     await register({ username: form.username, email: form.email, password: form.password })
     ElMessage.success('注册成功，请登录')
     router.push('/login')
-  } catch {
+  } catch (e) {
+    ElMessage.error(e?.message || '注册失败，请稍后重试')
   } finally {
     loading.value = false
   }

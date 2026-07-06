@@ -1,6 +1,6 @@
 <template>
   <div class="image2text-page">
-    <AiStatusBar />
+    <AiStatusBar :hide-t2-i="true" />
     <div class="page-grid">
       <div class="panel-left">
         <div class="card">
@@ -26,13 +26,10 @@
               </div>
             </el-upload>
 
-            <el-form :model="form" label-position="top" style="margin-top:20px">
-              <el-form-item label="分析类型">
-                <el-select v-model="form.analysisType" style="width:100%">
-                  <el-option label="通用描述" value="general" />
-                  <el-option label="艺术风格" value="artistic" />
-                  <el-option label="详细标签" value="tags" />
-                </el-select>
+            <el-form label-position="top" style="margin-top:20px">
+              <el-form-item v-if="showProgress" label="分析进度">
+                <el-progress :percentage="progress" :status="progress === 100 ? 'success' : undefined" :stroke-width="8" />
+                <p class="progress-text">{{ progressText }}</p>
               </el-form-item>
               <el-button type="primary" size="large" :loading="analyzing" @click="handleAnalyze" class="analyze-btn" :disabled="!file">
                 <el-icon><MagicStick /></el-icon> 开始分析
@@ -85,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { analyzeImage } from '@/api/image2text'
 import { ElMessage } from 'element-plus'
 import AiStatusBar from '@/components/common/AiStatusBar.vue'
@@ -94,13 +91,21 @@ const file = ref(null)
 const previewUrl = ref('')
 const analyzing = ref(false)
 const result = ref(null)
+const progress = ref(0)
+const progressText = ref('')
+const showProgress = ref(false)
 
-const form = reactive({
-  analysisType: 'general'
+let progressTimer = null
+
+onUnmounted(() => {
+  if (progressTimer) clearInterval(progressTimer)
 })
 
 function handleFileChange(uploadFile) {
   file.value = uploadFile.raw
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
   previewUrl.value = URL.createObjectURL(uploadFile.raw)
   result.value = null
 }
@@ -109,6 +114,10 @@ async function handleAnalyze() {
   if (!file.value) return
   analyzing.value = true
   result.value = null
+  showProgress.value = true
+  progress.value = 0
+  progressText.value = '上传图片...'
+  startProgress()
   try {
     const formData = new FormData()
     formData.append('image', file.value)
@@ -117,24 +126,45 @@ async function handleAnalyze() {
     if (record) {
       if (record.status === 'SUCCESS') {
         let parsed = {}
-        try { parsed = JSON.parse(record.outputContent || '{}') } catch {}
+        try { parsed = JSON.parse(record.outputContent || '{}') } catch { console.error('Failed to parse outputContent:', record.outputContent) }
         result.value = {
           description: parsed.description || record.outputContent || '',
           tags: parsed.tags || [],
           style: parsed.style || '',
           prompt: parsed.prompt || ''
         }
+        progress.value = 100
+        progressText.value = '分析完成'
+        setTimeout(() => { showProgress.value = false }, 1000)
         ElMessage.success('分析完成')
       } else {
-        result.value = null
+        showProgress.value = false
         ElMessage.error(record.outputContent || '分析失败，请检查AI服务配置')
       }
     }
   } catch (e) {
-    ElMessage.error('分析请求失败，请稍后重试')
+    showProgress.value = false
+    ElMessage.error(e?.message || '分析请求失败，请稍后重试')
+    console.error('Image2Text analyze error:', e)
   } finally {
     analyzing.value = false
+    if (progressTimer) clearInterval(progressTimer)
   }
+}
+
+function startProgress() {
+  if (progressTimer) clearInterval(progressTimer)
+  progressTimer = setInterval(() => {
+    if (progress.value < 30) {
+      progress.value += 3
+    } else if (progress.value < 90) {
+      progress.value += 1
+      progressText.value = 'AI 分析中（预估）...'
+    } else if (progress.value < 99) {
+      progress.value += 0.5
+      progressText.value = '处理结果...'
+    }
+  }, 300)
 }
 
 function copyPrompt() {
@@ -232,6 +262,12 @@ function copyPrompt() {
   background: linear-gradient(135deg, var(--accent), #06b6d4);
   border: none;
   color: #0b0f19;
+}
+
+.progress-text {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 .result-area {

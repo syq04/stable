@@ -9,6 +9,8 @@ public class Image2TextResult {
     private String description;
     private String errorMessage;
     private String providerName;
+    private Double accuracy;
+    private String accuracyDetail;
 
     public static Image2TextResult success(String description, String providerName) {
         Image2TextResult r = new Image2TextResult();

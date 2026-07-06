@@ -18,16 +18,10 @@ public class AiProviderManager {
     private volatile String activeText2ImageProvider;
     private volatile String activeImage2TextProvider;
 
-    @Value("${ai.text2image.fallback:mock}")
-    private String text2ImageFallback;
-
-    @Value("${ai.image2text.fallback:mock}")
-    private String image2TextFallback;
-
     public AiProviderManager(List<Text2ImageProvider> text2ImageProviders,
                              List<Image2TextProvider> image2TextProviders,
-                             @Value("${ai.text2image.provider:pollinations}") String activeText2ImageProvider,
-                             @Value("${ai.image2text.provider:pollinations}") String activeImage2TextProvider) {
+                             @Value("${ai.text2image.provider:local-model}") String activeText2ImageProvider,
+                             @Value("${ai.image2text.provider:mock}") String activeImage2TextProvider) {
         this.text2ImageProviders = text2ImageProviders;
         this.image2TextProviders = image2TextProviders;
         this.activeText2ImageProvider = activeText2ImageProvider;
@@ -43,12 +37,8 @@ public class AiProviderManager {
         if (provider != null && provider.isAvailable()) {
             return provider;
         }
-        log.warn("文生图提供商 [{}] 不可用，尝试回退到 [{}]", activeText2ImageProvider, text2ImageFallback);
-        Text2ImageProvider fallback = findText2ImageProvider(text2ImageFallback);
-        if (fallback != null && fallback.isAvailable()) {
-            return fallback;
-        }
-        return findText2ImageProvider("mock");
+        log.warn("文生图提供商 [{}] 不可用", activeText2ImageProvider);
+        return provider;
     }
 
     public Image2TextProvider getImage2TextProvider() {
@@ -56,12 +46,8 @@ public class AiProviderManager {
         if (provider != null && provider.isAvailable()) {
             return provider;
         }
-        log.warn("图生文提供商 [{}] 不可用，尝试回退到 [{}]", activeImage2TextProvider, image2TextFallback);
-        Image2TextProvider fallback = findImage2TextProvider(image2TextFallback);
-        if (fallback != null && fallback.isAvailable()) {
-            return fallback;
-        }
-        return findImage2TextProvider("mock");
+        log.warn("图生文提供商 [{}] 不可用", activeImage2TextProvider);
+        return provider;
     }
 
     public void switchText2ImageProvider(String providerName) {

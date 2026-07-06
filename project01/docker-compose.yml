@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  inference:
+    build:
+      context: ./inference-service
+      dockerfile: Dockerfile
+    container_name: nebula-inference
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./sd-models:/app/sd-models:ro
+    environment:
+      - SD_MODEL_DIR=/app/sd-models
+      - CUDA_LAUNCH_BLOCKING=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nebula-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:/app/data/nebula_studio;DB_CLOSE_DELAY=-1;MODE=MySQL
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+    volumes:
+      - backend-data:/app/data
+      - ./sd-models:/app/sd-models:ro
+    depends_on:
+      - inference
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nebula-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend-data:

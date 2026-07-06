@@ -15,12 +15,10 @@ public class DynamicConfigService {
 
     private final SystemConfigMapper systemConfigMapper;
 
-    /**
-     * 缓存：key=configKey, value=configValue
-     * 每次调用 getConfigValue 时都会尝试从 DB 刷新，确保拿到最新值
-     */
     private final Map<String, String> cache = new ConcurrentHashMap<>();
     private final Map<String, String> defaults = new ConcurrentHashMap<>();
+    private volatile long lastRefreshTime = 0;
+    private static final long CACHE_TTL_MS = 60_000;
 
     /**
      * 注册默认值（从 application.yml 注入）
@@ -33,12 +31,10 @@ public class DynamicConfigService {
         }
     }
 
-    /**
-     * 获取配置值：优先读数据库，数据库为空时读默认值
-     */
     public String getConfigValue(String key) {
-        // 每次都从 DB 刷新，确保拿到最新值（配置变更不频繁，直接查DB可接受）
-        refreshCache();
+        if (System.currentTimeMillis() - lastRefreshTime > CACHE_TTL_MS) {
+            refreshCache();
+        }
         String val = cache.get(key);
         if (val != null && !val.isBlank()) {
             return val;
@@ -55,26 +51,22 @@ public class DynamicConfigService {
         return (val == null || val.isBlank()) ? defaultValue : val;
     }
 
-    /**
-     * 从数据库刷新所有配置到缓存
-     */
     private void refreshCache() {
         try {
             systemConfigMapper.selectList(null).forEach(c -> {
                 String val = c.getConfigValue() != null ? c.getConfigValue() : "";
                 cache.put(c.getConfigKey(), val);
             });
+            lastRefreshTime = System.currentTimeMillis();
             log.debug("配置缓存已刷新，共 {} 条", cache.size());
         } catch (Exception e) {
             log.error("刷新配置缓存失败: {}", e.getMessage());
         }
     }
 
-    /**
-     * 使缓存失效（配置更新后调用，强制下次读取时刷新）
-     */
     public void invalidateCache() {
         cache.clear();
+        lastRefreshTime = 0;
         log.info("配置缓存已清空，下次读取将从数据库加载");
     }
 

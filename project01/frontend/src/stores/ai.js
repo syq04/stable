@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getAiServiceStatus, getAiProviders, switchText2ImageProvider, switchImage2TextProvider } from '@/api/ai'
+import { getAiServiceStatus, switchText2ImageProvider, switchImage2TextProvider } from '@/api/ai'
 
 export const useAiStore = defineStore('ai', () => {
   const text2ImageProviders = ref({})

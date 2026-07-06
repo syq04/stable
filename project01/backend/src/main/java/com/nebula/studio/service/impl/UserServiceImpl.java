@@ -72,10 +72,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user == null) {
             throw new BusinessException(1001, "用户不存在");
         }
-        if (StringUtils.hasText(request.getUsername())) {
+        if (StringUtils.hasText(request.getUsername()) && !request.getUsername().equals(user.getUsername())) {
+            if (lambdaQuery().eq(User::getUsername, request.getUsername()).exists()) {
+                throw new BusinessException(1003, "用户名已存在");
+            }
             user.setUsername(request.getUsername());
         }
-        if (StringUtils.hasText(request.getEmail())) {
+        if (StringUtils.hasText(request.getEmail()) && !request.getEmail().equals(user.getEmail())) {
+            if (lambdaQuery().eq(User::getEmail, request.getEmail()).exists()) {
+                throw new BusinessException(1004, "邮箱已被注册");
+            }
             user.setEmail(request.getEmail());
         }
         if (StringUtils.hasText(request.getAvatarUrl())) {
@@ -144,10 +150,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user == null) {
             throw new BusinessException(1001, "用户不存在");
         }
-        if (StringUtils.hasText(request.getUsername())) {
+        if (StringUtils.hasText(request.getUsername()) && !request.getUsername().equals(user.getUsername())) {
+            if (lambdaQuery().eq(User::getUsername, request.getUsername()).exists()) {
+                throw new BusinessException(1003, "用户名已存在");
+            }
             user.setUsername(request.getUsername());
         }
-        if (StringUtils.hasText(request.getEmail())) {
+        if (StringUtils.hasText(request.getEmail()) && !request.getEmail().equals(user.getEmail())) {
+            if (lambdaQuery().eq(User::getEmail, request.getEmail()).exists()) {
+                throw new BusinessException(1004, "邮箱已被注册");
+            }
             user.setEmail(request.getEmail());
         }
         if (StringUtils.hasText(request.getRole())) {

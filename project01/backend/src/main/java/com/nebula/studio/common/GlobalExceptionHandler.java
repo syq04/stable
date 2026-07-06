@@ -1,13 +1,17 @@
 package com.nebula.studio.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -27,6 +31,18 @@ public class GlobalExceptionHandler {
         return Result.error(400, msg);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result<Void> handleMissingParam(MissingServletRequestParameterException e) {
+        return Result.error(400, "缺少必需参数: " + e.getParameterName());
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result<Void> handleMissingPart(MissingServletRequestPartException e) {
+        return Result.error(400, "缺少必需文件: " + e.getRequestPartName());
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Result<Void> handleBadCredentials(BadCredentialsException e) {
@@ -42,6 +58,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {
-        return Result.error(500, "服务器内部错误: " + e.getMessage());
+        log.error("Unhandled exception", e);
+        return Result.error(500, "服务器内部错误");
     }
 }

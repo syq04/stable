@@ -1,5 +1,6 @@
 package com.nebula.studio.controller;
 
+import com.nebula.studio.ai.provider.LocalModelText2ImageProvider;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.nebula.studio.common.Result;
 import com.nebula.studio.dto.request.Text2ImageRequest;
@@ -12,17 +13,31 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ImageController {
 
     private final ImageRecordService imageRecordService;
+    private final LocalModelText2ImageProvider localModelProvider;
 
     @PostMapping("/text2image/generate")
     public Result<ImageRecord> text2Image(@AuthenticationPrincipal JwtUserDetails userDetails,
                                           @Valid @RequestBody Text2ImageRequest request) {
         return Result.success(imageRecordService.text2Image(userDetails.getUserId(), request));
+    }
+
+    @PostMapping("/text2image/evaluate")
+    public Result<Map<String, Object>> evaluateText2Image(@AuthenticationPrincipal JwtUserDetails userDetails,
+                                                           @Valid @RequestBody Text2ImageRequest request) {
+        return Result.success(imageRecordService.evaluate(userDetails.getUserId(), request));
+    }
+
+    @GetMapping("/text2image/progress/{taskId}")
+    public Result<Map<String, Object>> getText2ImageProgress(@PathVariable String taskId) {
+        return Result.success(localModelProvider.getProgress(taskId));
     }
 
     @GetMapping("/text2image/history")
@@ -48,8 +63,12 @@ public class ImageController {
 
     @PostMapping("/image2text/analyze")
     public Result<ImageRecord> image2Text(@AuthenticationPrincipal JwtUserDetails userDetails,
-                                          @RequestParam("image") MultipartFile image) {
-        return Result.success(imageRecordService.image2Text(userDetails.getUserId(), image));
+                                          @RequestParam(value = "image", required = false) MultipartFile image,
+                                          @RequestParam(value = "analysisType", defaultValue = "general") String analysisType) {
+        if (image == null || image.isEmpty()) {
+            return Result.error(400, "请上传图片文件");
+        }
+        return Result.success(imageRecordService.image2Text(userDetails.getUserId(), image, analysisType));
     }
 
     @GetMapping("/image2text/history")
@@ -69,8 +88,10 @@ public class ImageController {
     @PutMapping("/image2text/{id}")
     public Result<ImageRecord> updateImage2TextResult(@AuthenticationPrincipal JwtUserDetails userDetails,
                                                       @PathVariable Long id,
-                                                      @RequestBody ImageRecord request) {
-        return Result.success(imageRecordService.updateRecord(id, userDetails.getUserId(), request));
+                                                      @RequestBody Map<String, String> request) {
+        ImageRecord safeRecord = new ImageRecord();
+        safeRecord.setOutputContent(request.get("outputContent"));
+        return Result.success(imageRecordService.updateRecord(id, userDetails.getUserId(), safeRecord));
     }
 
     @DeleteMapping("/image2text/{id}")

@@ -113,15 +113,8 @@ const aiStatus = reactive({ text2ImageProviders: {}, image2TextProviders: {} })
 
 function getProviderDisplayName(name) {
   const map = {
-    'pollinations': 'Pollinations.ai',
-    'huggingface': 'HuggingFace',
-    'stable-diffusion': 'Stable Diffusion',
-    'doubao': '豆包视觉',
-    'gemini': 'Google Gemini',
-    'openrouter': 'OpenRouter',
-    'siliconflow': '硅基流动',
-    'zhipu': '智谱AI',
-    'mock': '模拟模式'
+    'local-model': '本地模型',
+    'qwen': '千问'
   }
   return map[name] || name
 }
@@ -135,12 +128,16 @@ onMounted(async () => {
         stat.value = data[stat.key]
       }
     })
-  } catch {}
+  } catch {
+    console.error('Failed to fetch admin dashboard stats')
+  }
   try {
     const aiRes = await getAiServiceStatus()
     aiStatus.text2ImageProviders = aiRes.data.text2ImageProviders || {}
     aiStatus.image2TextProviders = aiRes.data.image2TextProviders || {}
-  } catch {}
+  } catch {
+    console.error('Failed to fetch AI service status')
+  }
 })
 </script>
 

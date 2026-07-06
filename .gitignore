@@ -1,6 +1,10 @@
 # ComfyUI portable (36GB - download separately)
 ComfyUI_windows_portable_nvidia_cu126/
 
+# SD Models (7.7GB - too large for git)
+project01/sd-models/
+sd-models/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -26,6 +30,14 @@ outputs/
 # Build artifacts
 project01/frontend/dist/
 
+# Logs
+*.log
+project01/inference-service/*.log
+
+# H2 Database
+project01/backend/data/*.mv.db
+project01/backend/data/*.trace.db
+
 # AI tool sessions
 project01/.aionrs/
 
@@ -34,6 +46,8 @@ project01/apache-maven-3.9.15-src/
 
 # IDE
 .vscode/
+.idea/
+*.iml
 
 # OS
 Thumbs.db

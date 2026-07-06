@@ -9,4 +9,6 @@ public interface Image2TextProvider {
     Image2TextResult analyze(byte[] imageBytes, String mimeType, String prompt);
 
     Image2TextResult analyzeUrl(String imageUrl, String prompt);
+
+    Image2TextResult evaluateImageQuality(byte[] imageBytes, String mimeType, String originalPrompt);
 }

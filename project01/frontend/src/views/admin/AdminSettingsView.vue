@@ -15,29 +15,28 @@
           </el-form-item>
 
           <div class="section-title">AI 服务配置</div>
-          <el-form-item label="SD API 地址">
-            <el-input v-model="form['ai.sd.api.url']" />
+          <el-form-item label="推理服务地址">
+            <el-input v-model="form['ai.local-model.api-url']" placeholder="http://127.0.0.1:5000" />
           </el-form-item>
-          <el-form-item label="豆包 API 地址">
-            <el-input v-model="form['ai.doubao.api.url']" />
+          <el-form-item label="模型目录">
+            <el-input v-model="form['ai.local-model.model-dir']" placeholder="../sd-models" />
           </el-form-item>
-          <el-form-item label="OpenRouter API Key">
-            <el-input v-model="form['ai.openrouter.api-key']" type="password" show-password placeholder="免费视觉模型，配置后可启用图生文" />
+
+          <div class="section-title">千问配置</div>
+          <el-form-item label="API Key">
+            <el-input v-model="form['ai.qwen.api-key']" :type="showApiKey ? 'text' : 'password'" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxx">
+              <template #suffix>
+                <el-icon class="toggle-pwd" @click="showApiKey = !showApiKey">
+                  <View v-if="!showApiKey" /><Hide v-else />
+                </el-icon>
+              </template>
+            </el-input>
           </el-form-item>
-          <el-form-item label="Gemini API Key">
-            <el-input v-model="form['ai.gemini.api-key']" type="password" show-password placeholder="Google Gemini 视觉模型" />
+          <el-form-item label="API 地址">
+            <el-input v-model="form['ai.qwen.api-url']" placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions" />
           </el-form-item>
-          <el-form-item label="HuggingFace API Key">
-            <el-input v-model="form['ai.huggingface.api-key']" type="password" show-password placeholder="HuggingFace 模型服务" />
-          </el-form-item>
-          <el-form-item label="硅基流动 API Key">
-            <el-input v-model="form['ai.siliconflow.api-key']" type="password" show-password placeholder="国内免费文生图，推荐" />
-          </el-form-item>
-          <el-form-item label="智谱AI API Key">
-            <el-input v-model="form['ai.zhipu.api-key']" type="password" show-password placeholder="国内免费文生图+图生文，推荐" />
-          </el-form-item>
-          <el-form-item label="ComfyUI API 地址">
-            <el-input v-model="form['ai.comfyui.api-url']" placeholder="http://127.0.0.1:8188" />
+          <el-form-item label="模型名称">
+            <el-input v-model="form['ai.qwen.model']" placeholder="qwen3.5-omni-plus" />
           </el-form-item>
 
           <div class="section-title">存储配置</div>
@@ -75,23 +74,22 @@ import { ref, reactive, onMounted } from 'vue'
 import { getSystemConfigs, updateSystemConfig } from '@/api/system'
 import { useAiStore } from '@/stores/ai'
 import { ElMessage } from 'element-plus'
+import { View, Hide } from '@element-plus/icons-vue'
 
 const aiStore = useAiStore()
 
 const loading = ref(false)
 const saving = ref(false)
+const showApiKey = ref(false)
 
 const form = reactive({
   'app.name': '文图互转主题设计系统',
   'app.version': '1.0.0',
-  'ai.sd.api.url': 'http://localhost:7860',
-  'ai.doubao.api.url': 'https://api.doubao.com',
-  'ai.openrouter.api-key': '',
-  'ai.gemini.api-key': '',
-  'ai.huggingface.api-key': '',
-  'ai.siliconflow.api-key': '',
-  'ai.zhipu.api-key': '',
-  'ai.comfyui.api-url': 'http://127.0.0.1:8188',
+  'ai.local-model.api-url': 'http://127.0.0.1:5000',
+  'ai.local-model.model-dir': '../sd-models',
+  'ai.qwen.api-key': '',
+  'ai.qwen.api-url': 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+  'ai.qwen.model': 'qwen3.5-omni-plus',
   'storage.minio.url': 'http://localhost:9000',
   'storage.minio.bucket': 'ai-content',
   'security.jwt.expire-hours': '24',
@@ -186,5 +184,14 @@ onMounted(fetchConfigs)
 
 .section-title:first-child {
   margin-top: 0;
+}
+
+.toggle-pwd {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.toggle-pwd:hover {
+  color: var(--text-primary);
 }
 </style>

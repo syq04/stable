@@ -4,7 +4,7 @@
       <div class="card-header">
         <h3><el-icon><Clock /></el-icon> 文生图历史</h3>
         <div class="header-actions">
-          <el-input v-model="search" placeholder="搜索提示词..." prefix-icon="Search" clearable style="width:240px" />
+          <el-input v-model="search" placeholder="搜索提示词..." prefix-icon="Search" clearable style="width:240px" @clear="fetchData" @keyup.enter="fetchData" />
         </div>
       </div>
       <div class="card-body">

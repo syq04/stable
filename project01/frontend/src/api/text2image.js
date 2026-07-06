@@ -15,3 +15,15 @@ export function getText2ImageDetail(id) {
 export function deleteText2ImageRecord(id) {
   return request.delete(`/text2image/${id}`)
 }
+
+export function getText2ImageModels() {
+  return request.get('/text2image/models')
+}
+
+export function getText2ImageProgress(taskId) {
+  return request.get(`/text2image/progress/${taskId}`)
+}
+
+export function evaluateImage(data) {
+  return request.post('/text2image/evaluate', data)
+}

@@ -1,6 +1,7 @@
 package com.nebula.studio.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     private String passwordHash;
 
     private String role;
